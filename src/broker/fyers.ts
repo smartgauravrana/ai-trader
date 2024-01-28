@@ -82,6 +82,11 @@ export function getNetPositions(token: string): Promise<any> {
     return fyers.get_positions()
 }
 
+export function getAllOrders(token: string): Promise<any> {
+    fyers.setAccessToken(token)
+    return fyers.get_orders()
+}
+
 
 // fyers.get_profile().then((response) => {
 //   console.log(response)

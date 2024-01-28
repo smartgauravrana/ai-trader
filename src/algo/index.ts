@@ -1,10 +1,12 @@
 import { askAI } from "../ai";
-import { placeOrder, type OrderRequest, getNetPositions } from "../broker/fyers";
+import { placeOrder, type OrderRequest, getNetPositions, getAllOrders, ORDER_STATUS } from "../broker/fyers";
 import { downloadOptionContracts, findContract } from "../optionContracts";
 import { sendMessageToChannel } from "../telegram/bot";
 import cache, { getKey } from "../utils/cache";
 import getAccessToken from "../utils/login";
 const { MYSTIC_CHANNEL_ID, TRADE_QTY } = process.env
+
+const completedOrderStatus = [ORDER_STATUS.Pending, ORDER_STATUS.TradedOrFilled, ORDER_STATUS.Transit]
 
 export default async function runAlgo() {
   // process message with AI LLM
@@ -39,14 +41,22 @@ export default async function runAlgo() {
     return;
   }
 
+  const ordersRes = await getAllOrders(token);
+
+  const isOrderForTodayAlreadyDone = ordersRes.orderBook.some((order: any) => completedOrderStatus.includes(order.status))
+  if (isOrderForTodayAlreadyDone) {
+    console.log("No more trades to execute for today!");
+    return
+  }
+
   // if not, then create a new order with 30 point SL, and 50 point target.
   const orderRequest: OrderRequest = {
     symbol: contract.symbol,
     qty: TRADE_QTY ? Number(TRADE_QTY) : 0,
     limitPrice: aiResponse.ltp + 1,
     stopPrice: aiResponse.ltp,
-    stopLoss: aiResponse.ltp - 30,
-    takeProfit: aiResponse.ltp + 51
+    stopLoss: 31,
+    takeProfit: 55
 
   }
   const res = await placeOrder(token, orderRequest);
