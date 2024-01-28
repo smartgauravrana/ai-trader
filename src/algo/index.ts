@@ -1,9 +1,10 @@
 import { askAI } from "../ai";
-import { placeOrder, type OrderRequest } from "../broker/fyers";
+import { placeOrder, type OrderRequest, getNetPositions } from "../broker/fyers";
 import { downloadOptionContracts, findContract } from "../optionContracts";
+import { sendMessageToChannel } from "../telegram/bot";
 import cache, { getKey } from "../utils/cache";
 import getAccessToken from "../utils/login";
-const { MYSTIC_CHANNEL_ID } = process.env
+const { MYSTIC_CHANNEL_ID, TRADE_QTY } = process.env
 
 export default async function runAlgo() {
   // process message with AI LLM
@@ -29,13 +30,19 @@ export default async function runAlgo() {
     return;
   }
   // check any running position, pending orders, completed orders
+  const token = await getAccessToken();
+  const positionRes = await getNetPositions(token);
+  console.log("positions: ", positionRes)
+
+  if (positionRes.overall.count_total > 0) {
+    console.log('Today position already there, so skipping.. ');
+    return;
+  }
 
   // if not, then create a new order with 30 point SL, and 50 point target.
-
-  const token = await getAccessToken();
   const orderRequest: OrderRequest = {
     symbol: contract.symbol,
-    qty: 15,
+    qty: TRADE_QTY ? Number(TRADE_QTY) : 0,
     limitPrice: aiResponse.ltp + 1,
     stopPrice: aiResponse.ltp,
     stopLoss: aiResponse.ltp - 30,
@@ -44,6 +51,9 @@ export default async function runAlgo() {
   }
   const res = await placeOrder(token, orderRequest);
   console.log("Order placed: ", res)
+
+  await sendMessageToChannel(`Trade Execution ${res.s !== "error" ? "Success" : "Failed"}:
+  ${aiResponse.indexName} ${aiResponse.strike} ${aiResponse.type} above ${aiResponse.ltp} `)
 
 
 }

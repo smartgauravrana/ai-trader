@@ -7,6 +7,16 @@ export type OrderRequest = {
     takeProfit: number;
 }
 
+export enum ORDER_STATUS {
+    Canceled = 1,
+    TradedOrFilled = 2,
+    NotUsedCurrently = 3,
+    Transit = 4,
+    Rejected = 5,
+    Pending = 6,
+    Expired = 7
+}
+
 
 
 const fyersModel = require("fyers-api-v3").fyersModel
@@ -23,29 +33,29 @@ fyers.setRedirectUrl(REDIRECT_URL)
 
 
 
-export function getProfileData(fyers: any) {
-    fyers.get_profile().then((response) => {
-        console.log(response)
-    }).catch((err) => {
-        console.log(err)
-    })
-}
+// export function getProfileData(fyers: any) {
+//     fyers.get_profile().then((response) => {
+//         console.log(response)
+//     }).catch((err) => {
+//         console.log(err)
+//     })
+// }
 
-export function getQuotes(fyers: any) {
-    fyers.getQuotes(["NSE:SBIN-EQ", "NSE:TCS-EQ"]).then((response) => {
-        console.log(response)
-    }).catch((err) => {
-        console.log(err)
-    })
-}
+// export function getQuotes(fyers: any) {
+//     fyers.getQuotes(["NSE:SBIN-EQ", "NSE:TCS-EQ"]).then((response) => {
+//         console.log(response)
+//     }).catch((err) => {
+//         console.log(err)
+//     })
+// }
 
-export function getMarketDepth() {
-    fyers.getMarketDepth({ "symbol": ["NSE:SBIN-EQ", "NSE:TCS-EQ"], "ohlcv_flag": 1 }).then((response) => {
-        console.log(response)
-    }).catch((err) => {
-        console.log(err)
-    })
-}
+// export function getMarketDepth() {
+//     fyers.getMarketDepth({ "symbol": ["NSE:SBIN-EQ", "NSE:TCS-EQ"], "ohlcv_flag": 1 }).then((response) => {
+//         console.log(response)
+//     }).catch((err) => {
+//         console.log(err)
+//     })
+// }
 
 export function placeOrder(token: string, createOrderReq: OrderRequest): Promise<any> {
     fyers.setAccessToken(token)
@@ -65,6 +75,11 @@ export function placeOrder(token: string, createOrderReq: OrderRequest): Promise
         takeProfit,
     }
     return fyers.place_order(reqBody)
+}
+
+export function getNetPositions(token: string): Promise<any> {
+    fyers.setAccessToken(token)
+    return fyers.get_positions()
 }
 
 
