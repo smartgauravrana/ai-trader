@@ -18,8 +18,10 @@ function getStartOfCurrentDayISOString() {
 
 
 export const getKey = (channelId: string) => {
-  const startOfDayISOString = getStartOfCurrentDayISOString();
-  return `${channelId}#${startOfDayISOString}`
+  // const startOfDayISOString = getStartOfCurrentDayISOString();
+  const now = new Date();
+  const date = [now.getFullYear(), now.getMonth() + 1, now.getDate()].join("-");
+  return `${channelId}#${date}`
 }
 
 export default client
