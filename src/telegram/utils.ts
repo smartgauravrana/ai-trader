@@ -66,7 +66,7 @@ async function listenToChannelMessages(interval = 10000) {
 
   while (true) {
     try {
-      const messages = await getChannelMessages(MYSTIC_CHANNEL_ID);
+      const messages = await getChannelMessages(MYSTIC_CHANNEL_ID!);
       console.log('Messages:', messages);
     } catch (error) {
       console.error('Error listening to channel messages:', error);
@@ -82,8 +82,10 @@ function startListener() {
     const newChannelMessages = updates
       // .filter(msg => msg !== undefined)
       .filter((update: any) => update._ === 'updateNewChannelMessage')
-      .filter((update: any) => update.message?.peer_id?.channel_id === MYSTIC_CHANNEL_ID)
+      // .filter((update: any) => update.message?.peer_id?.channel_id === MYSTIC_CHANNEL_ID)
       .map(({ message }: any) => message) // filter `updateNewChannelMessage` types only and extract the 'message' object
+
+    console.log("message: ", newChannelMessages)
 
     for (const message of newChannelMessages) {
       // printing new channel messages
