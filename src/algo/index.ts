@@ -1,5 +1,6 @@
 import { askAI } from "../ai";
 import { placeOrder, type OrderRequest, getNetPositions, getAllOrders, ORDER_STATUS } from "../broker/fyers";
+import { logger } from "../logger";
 import { downloadOptionContracts, findContract } from "../optionContracts";
 import { sendMessageToChannel } from "../telegram/bot";
 import cache, { getKey } from "../utils/cache";
@@ -15,9 +16,9 @@ export default async function runAlgo() {
   let messageStr = message.join('\n')
 
   const aiResponse = await askAI(messageStr);
-  console.log(aiResponse);
+  logger.info({ aiResponse }, "response from ai");
   if (!aiResponse) {
-    console.log('NO TRADE')
+    logger.info('NO TRADE')
     return
   }
 
@@ -28,16 +29,17 @@ export default async function runAlgo() {
   const contract = findContract(optionsContracts, aiResponse?.strike, aiResponse?.type);
 
   if (!contract) {
-    console.log("no contract found!");
+    logger.info("no contract found!");
     return;
   }
+  logger.info({ contract }, "contract found!")
   // check any running position, pending orders, completed orders
   const token = await getAccessToken();
   const positionRes = await getNetPositions(token);
-  console.log("positions: ", positionRes)
+  logger.info({ positionRes }, "positions")
 
   if (positionRes.overall.count_total > 0) {
-    console.log('Today position already there, so skipping.. ');
+    logger.info('Today position already there, so skipping.. ');
     return;
   }
 
@@ -45,7 +47,7 @@ export default async function runAlgo() {
 
   const isOrderForTodayAlreadyDone = ordersRes.orderBook.some((order: any) => completedOrderStatus.includes(order.status))
   if (isOrderForTodayAlreadyDone) {
-    console.log("No more trades to execute for today!");
+    logger.info("No more trades to execute for today!");
     return
   }
 
@@ -60,7 +62,7 @@ export default async function runAlgo() {
 
   }
   const res = await placeOrder(token, orderRequest);
-  console.log("Order placed: ", res)
+  logger.info({ orderRes: res }, "Order placed")
 
   await sendMessageToChannel(`Trade Execution ${res.s !== "error" ? "Success" : "Failed"}:
   ${aiResponse.indexName} ${aiResponse.strike} ${aiResponse.type} above ${aiResponse.ltp} `)

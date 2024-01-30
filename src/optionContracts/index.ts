@@ -1,6 +1,7 @@
 import fetch from 'node-fetch';
 import { parse as csvParse } from 'csv-parse';
 import client from '../utils/cache';
+import { logger } from '../logger';
 
 export type Contract = {
   name: string;
@@ -39,7 +40,7 @@ async function downloadAndParseCSV(url: string, header: string): Promise<any[]> 
 export async function downloadOptionContracts(): Promise<Contract[]> {
   let data = await client.lrange('option_chain', 0, -1);
   if (data.length) {
-    console.log('CSV file from cache, header added, and parsed successfully.');
+    logger.info('CSV file from cache, header added, and parsed successfully.');
     const res: Contract[] = data.map(item => JSON.parse(item));
     return res;
   }
@@ -61,7 +62,7 @@ export async function downloadOptionContracts(): Promise<Contract[]> {
       optionType: item.OptionType,
 
     }))
-    console.log('CSV file downloaded, header added, and parsed successfully.');
+    logger.info('CSV file downloaded, header added, and parsed successfully.');
 
 
     await client.rpush("option_chain", ...result.map(item => JSON.stringify(item)))

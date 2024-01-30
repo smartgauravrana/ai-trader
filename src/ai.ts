@@ -1,4 +1,5 @@
 import fetch from 'node-fetch';
+import { logger } from './logger';
 
 export type AIResponse = {
   indexName: string;
@@ -79,7 +80,8 @@ function getBody(message: string) {
             Input: 45600 CE
             Output: NA
             
-            Your input for message is: ${message}`
+            Your input for message is: 
+            ${message}`
           }
         ]
       }
@@ -89,13 +91,13 @@ function getBody(message: string) {
 
 export const askAI = async (message: string): Promise<AIResponse | null> => {
   try {
-    console.log('Asking GEMINI.......')
+    logger.info('Asking GEMINI.......')
     const bodyData = getBody(message);
     options.body = JSON.stringify(bodyData)
     const response = await fetch(url, options);
     const responseData: any = await response.json();
     const text = responseData.candidates[0].content.parts[0].text.trim();
-    console.log("AI response: ", text);
+    logger.info("AI response: ", text);
 
     const messages = text.split('\n');
     const [firstMessage] = messages;

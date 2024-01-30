@@ -1,6 +1,7 @@
 import express from "express";
 import "./src/utils/login"
 import "./src/telegram/utils"
+import { logger } from "./src/logger";
 
 
 const app = express();
@@ -24,6 +25,6 @@ app.get("/webhook", (req: any, res: any) => {
 });
 
 app.listen(port, () => {
-    console.log(`Listening on port ${port}...`);
+    logger.info(`Listening on port ${port}...`);
 });
 

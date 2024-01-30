@@ -5,6 +5,7 @@ import MTProto from '@mtproto/core';
 import { sleep } from "@mtproto/core/src/utils/common";
 import client, { getKey } from "../utils/cache"
 import runAlgo from '../algo';
+import { logger } from '../logger';
 
 const { MYSTIC_CHANNEL_ID, TELEGRAM_API_ID, TELEGRAM_API_HASH } = process.env
 
@@ -67,7 +68,7 @@ async function listenToChannelMessages(interval = 10000) {
   while (true) {
     try {
       const messages = await getChannelMessages(MYSTIC_CHANNEL_ID!);
-      console.log('Messages:', messages);
+      logger.info({ messages }, 'Messages:');
     } catch (error) {
       console.error('Error listening to channel messages:', error);
     }
@@ -77,16 +78,16 @@ async function listenToChannelMessages(interval = 10000) {
 }
 
 function startListener() {
-  console.log('[+] starting listener')
+  logger.info('[+] starting listener')
   mtproto.updates.on('updates', async ({ updates }) => {
     const newChannelMessages = updates
       // .filter(msg => msg !== undefined)
-      .filter((update: any) => update._ === 'updateNewChannelMessage')
+      .filter((update: any) => ['updateNewChannelMessage', 'updateEditChannelMessage'].includes(update._))
       // .filter((update: any) => update.message?.peer_id?.channel_id === MYSTIC_CHANNEL_ID)
       .map(({ message }: any) => message)
       .filter((message: any) => message.peer_id?.channel_id === MYSTIC_CHANNEL_ID) // filter `updateNewChannelMessage` types only and extract the 'message' object
 
-    console.log("message: ", newChannelMessages)
+    logger.info({ newChannelMessages }, "telegram message")
 
     for (const message of newChannelMessages) {
       // printing new channel messages
@@ -109,7 +110,7 @@ mtproto
   .catch(async error => {
 
     // The user is not logged in
-    console.log('[+] You must log in')
+    logger.info('[+] You must log in')
     const phone_number = "+919729343885"
 
     mtproto.call('auth.sendCode', {
@@ -161,7 +162,7 @@ mtproto
         }
       })
       .then(result => {
-        console.log('[+] successfully authenticated');
+        logger.info('[+] successfully authenticated');
         // start listener since the user has logged in now
         listenToChannelMessages()
       });
