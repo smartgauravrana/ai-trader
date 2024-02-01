@@ -82,10 +82,10 @@ function startListener() {
   mtproto.updates.on('updates', async ({ updates }) => {
     logger.info({ updates }, "updates received")
     const newChannelMessages = updates
-      // .filter(msg => msg !== undefined)
+      .filter((msg: any) => msg !== undefined)
       // .filter((update: any) => ['updateNewChannelMessage', 'updateEditChannelMessage'].includes(update._))
       .map(({ message }: any) => message)
-      .filter((message: any) => message.peer_id?.channel_id === MYSTIC_CHANNEL_ID) // filter `updateNewChannelMessage` types only and extract the 'message' object
+      .filter((message?: any) => message?.peer_id?.channel_id === MYSTIC_CHANNEL_ID) // filter `updateNewChannelMessage` types only and extract the 'message' object
 
     logger.info({ newChannelMessages }, "telegram message")
 
