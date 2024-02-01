@@ -83,9 +83,8 @@ function startListener() {
     logger.info({ updates }, "updates received")
     const newChannelMessages = updates
       .filter((msg: any) => msg !== undefined)
-      // .filter((update: any) => ['updateNewChannelMessage', 'updateEditChannelMessage'].includes(update._))
+      .filter((update: any) => ['updateNewChannelMessage', 'updateEditChannelMessage', 'message'].includes(update._))
       .map(({ message }: any) => message)
-      .filter((message: any) => Boolean(message))
       .filter((message: any) => message?.peer_id?.channel_id === MYSTIC_CHANNEL_ID) // filter `updateNewChannelMessage` types only and extract the 'message' object
 
     logger.info({ newChannelMessages }, "telegram message")
