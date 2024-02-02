@@ -5,7 +5,7 @@ import "./src/utils/login"
 import { logger } from "./src/logger";
 import { processTelegramMessage, type TelegramMessage } from "./src/telegram";
 
-const HEALTH_CHECK_URL = 'http://localhost:3002/health';
+const HEALTH_CHECK_URL = 'http://127.0.0.1:3002/health';
 const INTERVAL_TIME_MS = 2 * 60 * 1000; // 2 minutes in milliseconds
 
 const { TELEGRAM_LISTENER_HEARTBEAT } = process.env;
@@ -17,8 +17,13 @@ async function checkHealthAndHitOtherUrl() {
 
         // If health check is successful (status code 200), hit the other URL
         if (response.ok) {
-            await fetch(TELEGRAM_LISTENER_HEARTBEAT!);
-            logger.info('Successfully hit the other URL');
+            const responseData: any = await response.json();
+
+            if (responseData.status == true) {
+
+                await fetch(TELEGRAM_LISTENER_HEARTBEAT!);
+                logger.info('Successfully hit the other URL');
+            }
         } else {
             logger.info('Health check failed');
         }
@@ -54,7 +59,7 @@ app.get("/webhook", (req: any, res: any) => {
     res.send("webhook");
 });
 
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
     logger.info(`Listening on port ${port}...`);
 });
 
