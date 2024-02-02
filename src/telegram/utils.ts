@@ -21,13 +21,13 @@ const mtproto = new MTProto({
   },
 });
 
-async function getPhone() {
-  return (await prompts({
-    type: 'text',
-    name: 'phone',
-    message: 'Enter your phone number:'
-  })).phone
-}
+// async function getPhone() {
+//   return (await prompts({
+//     type: 'text',
+//     name: 'phone',
+//     message: 'Enter your phone number:'
+//   })).phone
+// }
 
 async function getCode() {
   // you can implement your code fetching strategy here
@@ -47,36 +47,36 @@ async function getPassword() {
 }
 
 // Function to get messages history of a channel
-async function getChannelMessages(channelId: string, limit = 10) {
-  try {
-    const result = await mtproto.call('channels.getHistory', {
-      _: {},
-      channel: channelId,
-      limit: limit,
-    });
+// async function getChannelMessages(channelId: string, limit = 10) {
+//   try {
+//     const result = await mtproto.call('channels.getHistory', {
+//       _: {},
+//       channel: channelId,
+//       limit: limit,
+//     });
 
-    return result.messages;
-  } catch (error) {
-    console.error('Error fetching channel messages:', error);
-    return [];
-  }
-}
+//     return result.messages;
+//   } catch (error) {
+//     console.error('Error fetching channel messages:', error);
+//     return [];
+//   }
+// }
 
 // Function to continuously listen to messages of a channel
-async function listenToChannelMessages(interval = 10000) {
+// async function listenToChannelMessages(interval = 10000) {
 
-  while (true) {
-    try {
-      const messages = await getChannelMessages(MYSTIC_CHANNEL_ID!);
-      logger.info({ messages }, 'Messages:');
-    } catch (error) {
-      console.error('Error listening to channel messages:', error);
-    }
+//   while (true) {
+//     try {
+//       const messages = await getChannelMessages(MYSTIC_CHANNEL_ID!);
+//       logger.info({ messages }, 'Messages:');
+//     } catch (error) {
+//       console.error('Error listening to channel messages:', error);
+//     }
 
-    await sleep(interval); // Wait for the specified interval before fetching messages again
-  }
-}
-
+//     await sleep(interval); // Wait for the specified interval before fetching messages again
+//   }
+// }
+let count = 0;
 function startListener() {
   logger.info('[+] starting listener')
   mtproto.updates.on('updates', async ({ updates }) => {
@@ -98,6 +98,21 @@ function startListener() {
       runAlgo()
     }
   });
+
+  setInterval(async () => {
+    // check for connect
+    try {
+      const res = await mtproto.call('help.getNearestDc');
+      if (res && res.country) {
+        logger.info("Still connected for mins: " + ++count);
+      } else {
+        logger.info("empty res reconnecting")
+      }
+    } catch (e) {
+      logger.error("Failed to get user country");
+      logger.info("reconnecting");
+    }
+  }, 60 * 1000);
 }
 
 mtproto
@@ -164,7 +179,7 @@ mtproto
       .then(result => {
         logger.info('[+] successfully authenticated');
         // start listener since the user has logged in now
-        listenToChannelMessages()
+        startListener()
       });
   })
 

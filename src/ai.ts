@@ -14,18 +14,6 @@ const headers = {
   'Content-Type': 'application/json',
 };
 
-// const data = {
-//   contents: [
-//     {
-//       parts: [
-//         {
-//           text: "You are a helper for me.\nYou will receive list of messages about position to make in options segment of trading.\nThe message will contain the option buying tip with info like index name, \nstrike price, and whether it is call or put one.\nYou just need to grab all relevant info from messages in any format\nand display the output in below format:\n\nIndexName strikePrice limitPrice CE/PE\n\nNote if index is missing, then consider it as BANKNIFTY\nNote: If nothing is identified, display only NA as output\n\nMessage is:\n> Mystic Academy (PREMIUM) 🚀:\nGood morning! ✅\n\n> Mystic Academy (PREMIUM) 🚀:\nWas just observing the volatility.\n\n> Mystic Academy (PREMIUM) 🚀:\n47700 PE\n\n> Mystic Academy (PREMIUM) 🚀:\nAbove 345\n\n"
-//         }
-//       ]
-//     }
-//   ]
-// };
-
 const options = {
   method: 'POST',
   headers: headers,
