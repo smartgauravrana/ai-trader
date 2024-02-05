@@ -33,7 +33,7 @@ export async function createCustomer(
     totpKey,
   };
   // const token = await getFyersAccessTokenForUser(tokenRequest);
-  // const token = await getAccessToken();
+  const token = await getAccessToken();
   // const fundsRes = await getFundsDetails(token);
   // console.log("fundRes: ", fundsRes);
   const data = await CustomerModel.create(req.body);

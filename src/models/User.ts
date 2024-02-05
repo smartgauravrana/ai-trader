@@ -1,6 +1,4 @@
 import { prop, getModelForClass, modelOptions } from "@typegoose/typegoose";
-import { type Base } from "@typegoose/typegoose/lib/defaultClasses";
-import { Types } from "mongoose";
 import { BaseEntity } from "./BaseEntity";
 
 // Enum for status
@@ -11,7 +9,7 @@ enum CustomerStatus {
 }
 
 @modelOptions({ schemaOptions: { timestamps: true } })
-export class Customer extends BaseEntity {
+export class User extends BaseEntity {
   @prop({ required: true })
   name!: string;
 
@@ -48,8 +46,8 @@ export class Customer extends BaseEntity {
   @prop()
   lastRenewedData?: Date;
 
-  @prop({ type: String, enum: CustomerStatus, default: CustomerStatus.ACTIVE })
-  status!: CustomerStatus;
+  // @prop({ type: String, enum: CustomerStatus, default: CustomerStatus.ACTIVE })
+  // status!: CustomerStatus;
 
   @prop({ default: 15 })
   tradeQty!: number;
@@ -59,7 +57,10 @@ export class Customer extends BaseEntity {
 
   @prop({ default: 0 })
   accountBalance!: number;
+
+  @prop({ default: false })
+  isAdmin!: boolean;
 }
 
 // Create the Customer model
-export const CustomerModel = getModelForClass(Customer);
+export const UserModel = getModelForClass(User);
