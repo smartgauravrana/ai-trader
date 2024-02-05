@@ -1,5 +1,5 @@
-import fetch from 'node-fetch';
-import totp from 'totp-generator';
+import fetch from "node-fetch";
+import totp from "totp-generator";
 const FyersAPI = require("fyers-api-v3").fyersModel;
 
 const BASE_URL = "https://api-t2.fyers.in/vagator/v2";
@@ -11,12 +11,24 @@ const URL_TOKEN = `${BASE_URL_2}/token`;
 const SUCCESS = 1;
 const ERROR = -1;
 
-async function sendLoginOTP(fy_id: string, app_id: string): Promise<[number, any]> {
+export type FyersTokenRequest = {
+  fyersId: string;
+  totpKey: string;
+  pin: string;
+  appId: string;
+  redirectUrl: string;
+  appSecret: string;
+};
+
+async function sendLoginOTP(
+  fy_id: string,
+  app_id: string
+): Promise<[number, any]> {
   try {
     const response = await fetch(URL_SEND_LOGIN_OTP, {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify({ fy_id, app_id }),
-      headers: { 'Content-Type': 'application/json' }
+      headers: { "Content-Type": "application/json" },
     });
 
     const data = await response.json();
@@ -32,12 +44,15 @@ async function sendLoginOTP(fy_id: string, app_id: string): Promise<[number, any
   }
 }
 
-async function verifyTOTP(request_key: string, totp: string): Promise<[number, any]> {
+async function verifyTOTP(
+  request_key: string,
+  totp: string
+): Promise<[number, any]> {
   try {
     const response = await fetch(URL_VERIFY_TOTP, {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify({ request_key, otp: totp }),
-      headers: { 'Content-Type': 'application/json' }
+      headers: { "Content-Type": "application/json" },
     });
 
     const data = await response.json();
@@ -53,7 +68,14 @@ async function verifyTOTP(request_key: string, totp: string): Promise<[number, a
   }
 }
 
-async function generateAccessToken(FY_ID: string, TOTP_KEY: string, PIN: string, APP_ID: string, REDIRECT_URI: string, APP_SECRET: string): Promise<[any, string]> {
+async function generateAccessToken(
+  FY_ID: string,
+  TOTP_KEY: string,
+  PIN: string,
+  APP_ID: string,
+  REDIRECT_URI: string,
+  APP_SECRET: string
+): Promise<[any, string]> {
   const APP_ID_TYPE = "2";
   const APP_TYPE = "100";
 
@@ -80,46 +102,50 @@ async function generateAccessToken(FY_ID: string, TOTP_KEY: string, PIN: string,
 
   const request_key_2 = verify_totp_result[1];
   const payload_pin = {
-    "request_key": request_key_2,
-    "identity_type": "pin",
-    "identifier": PIN,
-    "recaptcha_token": ""
+    request_key: request_key_2,
+    identity_type: "pin",
+    identifier: PIN,
+    recaptcha_token: "",
   };
   const res_pin = await fetch(URL_VERIFY_PIN, {
-    method: 'POST',
+    method: "POST",
     body: JSON.stringify(payload_pin),
-    headers: { 'Content-Type': 'application/json' }
+    headers: { "Content-Type": "application/json" },
   });
   const data_pin = await res_pin.json();
-  const access_token = data_pin['data']['access_token'];
+  const access_token = data_pin["data"]["access_token"];
 
   const authParam = {
-    "fyers_id": FY_ID,
-    "app_id": APP_ID,
-    "redirect_uri": REDIRECT_URI,
-    "appType": APP_TYPE,
-    "code_challenge": "",
-    "state": "None",
-    "scope": "",
-    "nonce": "",
-    "response_type": "code",
-    "create_cookie": true
+    fyers_id: FY_ID,
+    app_id: APP_ID,
+    redirect_uri: REDIRECT_URI,
+    appType: APP_TYPE,
+    code_challenge: "",
+    state: "None",
+    scope: "",
+    nonce: "",
+    response_type: "code",
+    create_cookie: true,
   };
 
   let authres;
   try {
     authres = await fetch(URL_TOKEN, {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(authParam),
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${access_token}` }
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${access_token}`,
+      },
     });
   } catch (error) {
     authres = error.response;
   }
   const data_authres = await authres.json();
-  const url = data_authres['Url'];
+  console.log("data_auth: ", data_authres);
+  const url = data_authres["Url"];
   const parsed = new URL(url);
-  const auth_code = parsed.searchParams.get('auth_code');
+  const auth_code = parsed.searchParams.get("auth_code");
 
   const fyers = new FyersAPI();
   fyers.setAppId(`${APP_ID}-${APP_TYPE}`);
@@ -127,7 +153,10 @@ async function generateAccessToken(FY_ID: string, TOTP_KEY: string, PIN: string,
 
   let akstkn;
   try {
-    const tokenResp = await fyers.generate_access_token({ "secret_key": APP_SECRET, "auth_code": auth_code });
+    const tokenResp = await fyers.generate_access_token({
+      secret_key: APP_SECRET,
+      auth_code: auth_code,
+    });
 
     if (tokenResp.s == "ok") {
       akstkn = tokenResp.access_token;
@@ -150,8 +179,8 @@ const {
   TOTP_KEY,
   FYERS_PIN,
   REDIRECT_URL,
-  FYERS_SECRET_ID
-} = process.env
+  FYERS_SECRET_ID,
+} = process.env;
 export default async function getAccessToken() {
   const FYID = FYERS_ID;
   const TotpKey = TOTP_KEY;
@@ -159,9 +188,35 @@ export default async function getAccessToken() {
   const APPID = FYERS_APP_ID;
   const RedirectURL = REDIRECT_URL;
   const AppSecret = FYERS_SECRET_ID;
-  const resp = await generateAccessToken(FYID!, TotpKey!, Pin!, APPID!, RedirectURL!, AppSecret!);
+  const resp = await generateAccessToken(
+    FYID!,
+    TotpKey!,
+    Pin!,
+    APPID!,
+    RedirectURL!,
+    AppSecret!
+  );
   const token = resp[1];
   return token;
 }
 
-
+export async function getFyersAccessTokenForUser({
+  fyersId,
+  totpKey,
+  pin,
+  appId,
+  appSecret,
+  redirectUrl,
+}: FyersTokenRequest) {
+  console.log("hello", fyersId, totpKey, pin, appId, appSecret, redirectUrl);
+  const resp = await generateAccessToken(
+    fyersId,
+    totpKey,
+    pin,
+    appId,
+    redirectUrl,
+    appSecret
+  );
+  const token = resp[1];
+  return token;
+}
