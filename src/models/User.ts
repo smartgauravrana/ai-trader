@@ -1,24 +1,7 @@
 import { prop, getModelForClass, modelOptions } from "@typegoose/typegoose";
 import { BaseEntity } from "./BaseEntity";
 
-// Enum for status
-enum CustomerStatus {
-  ACTIVE = "active",
-  PAUSED = "paused",
-  INACTIVE = "inactive",
-}
-
-@modelOptions({ schemaOptions: { timestamps: true } })
-export class User extends BaseEntity {
-  @prop({ required: true })
-  name!: string;
-
-  @prop({ required: true })
-  phone!: string;
-
-  @prop({ required: true })
-  email!: string;
-
+export class UserMetadata {
   @prop({ required: true })
   fyersId!: string;
 
@@ -46,9 +29,6 @@ export class User extends BaseEntity {
   @prop()
   lastRenewedData?: Date;
 
-  // @prop({ type: String, enum: CustomerStatus, default: CustomerStatus.ACTIVE })
-  // status!: CustomerStatus;
-
   @prop({ default: 15 })
   tradeQty!: number;
 
@@ -57,6 +37,24 @@ export class User extends BaseEntity {
 
   @prop({ default: 0 })
   accountBalance!: number;
+}
+
+@modelOptions({ schemaOptions: { timestamps: true } })
+export class User extends BaseEntity {
+  @prop({ required: true })
+  name!: string;
+
+  @prop({ required: true })
+  phone!: string;
+
+  @prop({ required: true })
+  password!: string;
+
+  @prop({ default: null })
+  metadata?: UserMetadata;
+
+  @prop()
+  email?: string;
 
   @prop({ default: false })
   isAdmin!: boolean;
