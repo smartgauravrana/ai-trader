@@ -6,12 +6,14 @@ import "./src/utils/heartbeat";
 import { connectToDB } from "./src/db";
 import router from "./src/routes";
 import cookieParser from "cookie-parser";
+import { authenticateJWT } from "./src/middleware/authenticate";
+import { loginHandler } from "./src/controllers/auth";
 
+const port = 3001;
 const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
-const port = 3001;
 
 app.post(
   "/message",
@@ -21,6 +23,10 @@ app.post(
     await processTelegramMessage(message);
   }
 );
+
+app.post("/api/login", loginHandler);
+
+app.use(authenticateJWT);
 
 app.get("/redirect-fyers", (req: any, res: any) => {
   console.log(req.query);

@@ -1,4 +1,9 @@
-import { prop, getModelForClass, modelOptions } from "@typegoose/typegoose";
+import {
+  prop,
+  getModelForClass,
+  modelOptions,
+  index,
+} from "@typegoose/typegoose";
 import { BaseEntity } from "./BaseEntity";
 
 export class UserMetadata {
@@ -17,9 +22,6 @@ export class UserMetadata {
   @prop({ required: true })
   fyersPin!: string;
 
-  @prop({ required: true })
-  fyersRedirectUrl!: string;
-
   @prop()
   telegramBotToken?: string;
 
@@ -32,14 +34,18 @@ export class UserMetadata {
   @prop({ default: 15 })
   tradeQty!: number;
 
-  @prop()
-  totpKey!: string;
-
   @prop({ default: 0 })
   accountBalance!: number;
+
+  @prop()
+  accessToken?: string;
+
+  @prop()
+  refreshToken?: string;
 }
 
 @modelOptions({ schemaOptions: { timestamps: true } })
+@index({ phone: 1 }, { unique: true })
 export class User extends BaseEntity {
   @prop({ required: true })
   name!: string;
