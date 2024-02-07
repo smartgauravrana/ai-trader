@@ -1,18 +1,20 @@
-import { type Response, type Request } from "express";
+import { type Response, type Request, type NextFunction } from "express";
 import { UserModel } from "../../models/User";
+import { Forbidden } from "http-errors";
 
 const { REDIRECT_URL } = process.env;
 
-export async function getAuthUrl(req: Request, res: Response) {
-  console.log("user: ", req.user);
-
+export async function getAuthUrl(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   if (!req.user?.metadata) {
-    return res.status(403).send({ message: "Please update Profile data" });
+    return next(Forbidden("Please update Profile data"));
   }
 
   const { fyersAppId } = req.user.metadata;
 
-  // return res.send({ status: "ok" });
   // Create a new instance of FyersAPI
   const FyersAPI = require("fyers-api-v3").fyersModel;
   const fyers = new FyersAPI();
@@ -25,7 +27,7 @@ export async function getAuthUrl(req: Request, res: Response) {
 
   // Generate the URL to initiate the OAuth2 authentication process and get the authorization code
   const generateAuthcodeURL = fyers.generateAuthCode();
-  res.send({
+  res.success({
     data: generateAuthcodeURL,
   });
 }
@@ -57,5 +59,5 @@ export async function handleRedirectUri(req: Request, res: Response) {
     return res.status(500).send({ data: tokenRes });
   }
 
-  res.send({ data: tokenRes });
+  res.success({ data: tokenRes });
 }

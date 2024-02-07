@@ -2,20 +2,18 @@ import type { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import { UserModel } from "../../models/User";
 import type { InviteUserRequest } from "./schema";
+import asyncHandler from "../../utils/asyncHandler";
 
-export async function inviteUser(
-  req: Request<{}, {}, InviteUserRequest>,
-  res: Response
-) {
-  try {
+export const inviteUser = asyncHandler(
+  async (req: Request<{}, {}, InviteUserRequest>, res: Response) => {
     const { phone, password, name } = req.body;
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = { phone, password: hashedPassword, name };
     const data = await UserModel.create(newUser);
 
-    res.status(201).json({ message: "User registered successfully", data });
-  } catch (e: any) {
-    console.log(e.message);
+    res.success({
+      data,
+    });
   }
-}
+);
