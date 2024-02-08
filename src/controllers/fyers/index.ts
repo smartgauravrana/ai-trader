@@ -1,8 +1,9 @@
 import { type Response, type Request, type NextFunction } from "express";
 import { UserModel } from "../../models/User";
 import { Forbidden } from "http-errors";
+import { logger } from "../../logger";
 
-const { REDIRECT_URL } = process.env;
+const { REDIRECT_URL, WEBAPP_URL } = process.env;
 
 export async function getAuthUrl(
   req: Request,
@@ -33,8 +34,9 @@ export async function getAuthUrl(
 }
 
 export async function handleRedirectUri(req: Request, res: Response) {
+  logger.info("In redirect handler");
   const { fyersAppId, fyersSecretId } = req.user?.metadata!;
-  // return res.send({ status: "ok", data: req.query });
+
   const FyersAPI = require("fyers-api-v3").fyersModel;
   const fyers = new FyersAPI();
   fyers.setAppId(fyersAppId);
@@ -56,8 +58,8 @@ export async function handleRedirectUri(req: Request, res: Response) {
       },
     });
   } else {
-    return res.status(500).send({ data: tokenRes });
+    return res.redirect(WEBAPP_URL! + "?success=false");
   }
 
-  res.success({ data: tokenRes });
+  res.redirect(WEBAPP_URL! + "?success=true");
 }

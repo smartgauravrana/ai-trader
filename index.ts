@@ -7,7 +7,7 @@ import { connectToDB } from "./src/db";
 import router from "./src/routes";
 import cookieParser from "cookie-parser";
 import { authenticateJWT } from "./src/middleware/authenticate";
-import { loginHandler } from "./src/controllers/auth";
+import { loginHandler, logout } from "./src/controllers/auth";
 import { successHandler } from "./src/middleware/successHandler";
 import { errorHandler } from "./src/middleware/errorHandler";
 
@@ -28,6 +28,7 @@ app.post(
 );
 
 app.post("/api/login", loginHandler);
+app.get("/api/logout", logout);
 
 app.use(authenticateJWT);
 

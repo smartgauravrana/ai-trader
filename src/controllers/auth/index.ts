@@ -3,13 +3,12 @@ import jwt from "jsonwebtoken";
 import { UserModel } from "../../models/User";
 import type { Request, Response } from "express";
 
-const { JWT_SECRET_KEY } = process.env;
+const { JWT_SECRET_KEY, WEBAPP_URL } = process.env;
 
 export const loginHandler = async (req: Request, res: Response) => {
   try {
     const { phone, password } = req.body;
     const dbUser = await UserModel.findOne({ phone }).lean();
-    const hashedPwd = await bcrypt.hash(password, 10);
 
     if (!dbUser) {
       return res.status(404).json({ message: "Not Found" });
@@ -36,4 +35,9 @@ export const loginHandler = async (req: Request, res: Response) => {
   } catch (e: any) {
     console.log(e.message);
   }
+};
+
+export const logout = async (req: Request, res: Response) => {
+  res.clearCookie("jwt");
+  res.redirect(WEBAPP_URL!);
 };

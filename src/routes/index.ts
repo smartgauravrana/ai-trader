@@ -9,7 +9,11 @@ import {
   UpdateUserRequestSchema,
   createUserSchema,
 } from "../controllers/users/schema.ts";
-import { createUser, updateProfile } from "../controllers/users/index.ts";
+import {
+  createUser,
+  getCurrentUser,
+  updateProfile,
+} from "../controllers/users/index.ts";
 import { getAuthUrl, handleRedirectUri } from "../controllers/fyers/index.ts";
 
 import { inviteUser } from "../controllers/admin/index.ts";
@@ -30,6 +34,8 @@ router.route("/redirect-fyers").get(handleRedirectUri);
 router.route("/admin/invite-user").post(inviteUser);
 
 // Users
+router.route("/users/me").get(getCurrentUser);
+
 router
   .route("/users/:userId")
   .put(schemaValidation(UpdateUserRequestSchema), updateProfile);

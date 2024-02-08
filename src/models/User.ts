@@ -19,9 +19,6 @@ export class UserMetadata {
   @prop()
   botToken?: string;
 
-  @prop({ required: true })
-  fyersPin!: string;
-
   @prop()
   telegramBotToken?: string;
 

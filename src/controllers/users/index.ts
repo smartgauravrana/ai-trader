@@ -1,8 +1,9 @@
 import type { CreateUserRequest } from "../../dto/user";
 import { type Response, type Request, type NextFunction } from "express";
-import { UserMetadata, UserModel } from "../../models/User";
+import { UserModel } from "../../models/User";
 import type { UpdateUserRequest } from "./schema";
 import { NotFound, Forbidden } from "http-errors";
+import asyncHandler from "../../utils/asyncHandler";
 
 export async function createUser(
   req: Request<{}, {}, CreateUserRequest>,
@@ -21,7 +22,6 @@ export async function updateProfile(
 ) {
   const { userId } = req.params;
   if (req.user?.id.toString() !== userId) {
-    // return res.status(403).send();
     return next(Forbidden());
   }
 
@@ -29,7 +29,6 @@ export async function updateProfile(
 
   const user = await UserModel.findById(userId);
   if (!user) {
-    // return res.status(404).send({ message: "no user found" });
     return next(NotFound("User not found"));
   }
   user.metadata = {
@@ -40,3 +39,16 @@ export async function updateProfile(
   await user.save();
   res.success({ data: user });
 }
+
+export const getCurrentUser = asyncHandler(
+  async (req: Request, res: Response) => {
+    const user = await UserModel.findById(req.user?._id);
+    if (!user) {
+      throw NotFound("User not found");
+    }
+
+    res.success({
+      data: user,
+    });
+  }
+);

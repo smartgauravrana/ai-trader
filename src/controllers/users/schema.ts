@@ -8,7 +8,7 @@ export const createUserSchema = z.object({
   fyersId: z.string().nonempty("Fyers Account Id is required"),
   fyersAppId: z.string().nonempty("Fyers App Id is required"),
   fyersSecretId: z.string().nonempty("Fyers Secret Id is required"),
-  fyersPin: z.string().nonempty("Fyers Pin is required"),
+  // fyersPin: z.string().nonempty("Fyers Pin is required"),
   totpKey: z.string().nonempty("Totp Key is required"),
 });
 
@@ -19,9 +19,6 @@ const UpdateUserRequestSchema = z.object({
     fyersId: z.string(),
     fyersAppId: z.string(),
     fyersSecretId: z.string(),
-    fyersPin: z.string(),
-    fyersRedirectUrl: z.string().url(),
-    totpKey: z.string(),
   }),
 });
 
