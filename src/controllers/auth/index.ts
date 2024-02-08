@@ -1,4 +1,3 @@
-import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { UserModel } from "../../models/User";
 import type { Request, Response } from "express";
@@ -14,7 +13,7 @@ export const loginHandler = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Not Found" });
     }
 
-    if (await bcrypt.compare(password, dbUser.password)) {
+    if (await Bun.password.verify(password, dbUser.password)) {
       const token = jwt.sign(
         {
           id: dbUser._id.toString(),
