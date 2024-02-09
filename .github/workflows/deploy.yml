@@ -36,7 +36,8 @@ jobs:
           echo TELEGRAM_NOTIFICATION_CHANNEL=${{ secrets.TELEGRAM_NOTIFICATION_CHANNEL}} >> .env
           echo TRADE_QTY=${{ secrets.TRADE_QTY}} >> .env
           echo BETTER_STACK_SOURCE_TOKEN=${{ secrets.BETTER_STACK_SOURCE_TOKEN}} >> .env
-          echo MONGODB_URI=${{ secrets.MONGODB_URI}} >> .env
+          echo TELEGRAM_LISTENER_HEARTBEAT=${{ secrets.TELEGRAM_LISTENER_HEARTBEAT}} >> .env
+          echo DB_CONNECTION_STRING=${{ secrets.DB}} >> .env
           echo JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY}} >> .env
           echo WEBAPP_URL=${{ secrets.WEBAPP_URL}} >> .env
           echo "Printing .env"
