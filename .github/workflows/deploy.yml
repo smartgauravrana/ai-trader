@@ -37,7 +37,6 @@ jobs:
           echo TRADE_QTY=${{ secrets.TRADE_QTY}} >> .env
           echo BETTER_STACK_SOURCE_TOKEN=${{ secrets.BETTER_STACK_SOURCE_TOKEN}} >> .env
           echo TELEGRAM_LISTENER_HEARTBEAT=${{ secrets.TELEGRAM_LISTENER_HEARTBEAT}} >> .env
-          echo DB_CONNECTION_STRING=${{ secrets.DB}} >> .env
           echo JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY}} >> .env
           echo WEBAPP_URL=${{ secrets.WEBAPP_URL}} >> .env
           echo "Printing .env"
@@ -55,6 +54,7 @@ jobs:
       - name: Executing cmd on remote
         run: |
           ssh -y root@${{ secrets.SSH_HOST }} 'cd ~/app/ai-trader && echo'
+          ssh -y root@${{ secrets.SSH_HOST }} 'cd ~/app && cat DB_STRING_ENV >> ./ai-trader/.env'
           # echo 'Installing dependencies'
           ssh -y root@${{ secrets.SSH_HOST }} 'cd ~/app/ai-trader && bun install'
           # echo 'Starting pm2 app'
