@@ -1,0 +1,59 @@
+name: Backend deploy Job
+on: [push]
+jobs:
+  build-app:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: oven-sh/setup-bun@v1
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          known_hosts: unnecessary
+      - name: Adding Known Hosts
+        run: ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+      # - name: Install node_modules
+      #   run: yarn
+      - name: Creating .env file
+        run: |
+          echo API_KEY=${{ secrets.API_KEY}} >> .env
+          echo FYERS_ID=${{ secrets.FYERS_ID}} >> .env
+          echo FYERS_APP_ID=${{ secrets.FYERS_APP_ID}} >> .env
+          echo FYERS_SECRET_ID=${{ secrets.FYERS_SECRET_ID}} >> .env
+          echo TOTP_KEY=${{ secrets.TOTP_KEY}} >> .env
+          echo FYERS_PIN=${{ secrets.FYERS_PIN}} >> .env
+          echo REDIRECT_URL=${{ secrets.REDIRECT_URL}} >> .env
+          echo TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN}} >> .env
+          echo MYSTIC_CHANNEL_ID=${{ secrets.MYSTIC_CHANNEL_ID}} >> .env
+          echo TELEGRAM_API_ID=${{ secrets.TELEGRAM_API_ID}} >> .env
+          echo TELEGRAM_API_HASH=${{ secrets.TELEGRAM_API_HASH}} >> .env
+          echo REDIS_ENDPOINT=${{ secrets.REDIS_ENDPOINT}} >> .env
+          echo REDIS_PWD=${{ secrets.REDIS_PWD}} >> .env
+          echo TELEGRAM_NOTIFICATION_CHANNEL=${{ secrets.TELEGRAM_NOTIFICATION_CHANNEL}} >> .env
+          echo TRADE_QTY=${{ secrets.TRADE_QTY}} >> .env
+          echo BETTER_STACK_SOURCE_TOKEN=${{ secrets.BETTER_STACK_SOURCE_TOKEN}} >> .env
+          echo MONGODB_URI=${{ secrets.MONGODB_URI}} >> .env
+          echo JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY}} >> .env
+          echo WEBAPP_URL=${{ secrets.WEBAPP_URL}} >> .env
+      # - name: Build the project
+      #   run: yarn build
+      - name: Listing files and remove node_modules
+        run: |
+          ls -a
+          rm -rf node_modules
+      # - name: Deploy with rsync
+      #   run: |
+      #     rsync -avz * root@${{ secrets.SSH_HOST }}:./app/ai-trader
+      #     rsync -avz .env root@${{ secrets.SSH_HOST }}:./app/ai-trader
+      - name: Executing cmd on remote
+        run: |
+          ssh -y root@${{ secrets.SSH_HOST }} 'cd app && echo'
+          # echo 'Installing pm2'
+          # ssh -y root@${{ secrets.SSH_HOST }} 'yarn global add pm2'
+          # echo 'Starting pm2 app'
+          # ssh -y root@${{ secrets.SSH_HOST }} 'cd ~/app && pm2 restart candly'
+          # ssh -y root@${{ secrets.SSH_HOST }} 'pm2 startup systemd'
+          # ssh -y root@${{ secrets.SSH_HOST }} 'pm2 save'
+      - name: Setup finish
+        run: echo "Setup Finished!"
