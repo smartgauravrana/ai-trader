@@ -1,4 +1,4 @@
-name: Backend deploy Job
+name: AI Trader API deploy Job
 on:
   push:
     branches:
@@ -51,7 +51,7 @@ jobs:
       #     rsync -avz .env root@${{ secrets.SSH_HOST }}:./app/ai-trader
       - name: Executing cmd on remote
         run: |
-          ssh -y root@${{ secrets.SSH_HOST }} 'cd app && echo'
+          ssh -y root@${{ secrets.SSH_HOST }} 'cd ~/app && echo'
           # echo 'Installing pm2'
           # ssh -y root@${{ secrets.SSH_HOST }} 'yarn global add pm2'
           # echo 'Starting pm2 app'
