@@ -11,6 +11,7 @@
   "dependencies": {
     "@logtail/pino": "^0.4.19",
     "@mtproto/core": "^6.3.0",
+    "@supercharge/promise-pool": "^3.1.1",
     "@typegoose/typegoose": "^12.1.0",
     "@types/cookie-parser": "^1.4.6",
     "@types/express": "^4.17.21",

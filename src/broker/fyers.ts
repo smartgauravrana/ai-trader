@@ -17,20 +17,6 @@ export enum ORDER_STATUS {
   Expired = 7,
 }
 
-const fyersModel = require("fyers-api-v3").fyersModel;
-const APP_TYPE = "100";
-
-const fyers = new fyersModel({
-  path: "path where you want to save logs",
-  enableLogging: false,
-});
-
-const { FYERS_APP_ID, FYERS_SECRET_ID, REDIRECT_URL } = process.env;
-
-fyers.setAppId(`${FYERS_APP_ID}-${APP_TYPE}`);
-
-fyers.setRedirectUrl(REDIRECT_URL);
-
 // export function getProfileData(fyers: any) {
 //     fyers.get_profile().then((response) => {
 //         console.log(response)
@@ -56,10 +42,9 @@ fyers.setRedirectUrl(REDIRECT_URL);
 // }
 
 export function placeOrder(
-  token: string,
+  fyers: any,
   createOrderReq: OrderRequest
 ): Promise<any> {
-  fyers.setAccessToken(token);
   const { symbol, qty, limitPrice, stopLoss, takeProfit, stopPrice } =
     createOrderReq;
   const reqBody = {
@@ -79,18 +64,15 @@ export function placeOrder(
   return fyers.place_order(reqBody);
 }
 
-export function getNetPositions(token: string): Promise<any> {
-  fyers.setAccessToken(token);
+export function getNetPositions(fyers: any): Promise<any> {
   return fyers.get_positions();
 }
 
-export function getFundsDetails(token: string): Promise<any> {
-  fyers.setAccessToken(token);
+export function getFundsDetails(fyers: any): Promise<any> {
   return fyers.get_funds();
 }
 
-export function getAllOrders(token: string): Promise<any> {
-  fyers.setAccessToken(token);
+export function getAllOrders(fyers: any): Promise<any> {
   return fyers.get_orders();
 }
 
