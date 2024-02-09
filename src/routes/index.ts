@@ -11,12 +11,14 @@ import {
 } from "../controllers/users/schema.ts";
 import {
   createUser,
+  getAllUsers,
   getCurrentUser,
   updateProfile,
 } from "../controllers/users/index.ts";
 import { getAuthUrl, handleRedirectUri } from "../controllers/fyers/index.ts";
 
 import { inviteUser } from "../controllers/admin/index.ts";
+import { adminProtect } from "../middleware/adminProtect.ts";
 
 const router = Router({ mergeParams: true });
 
@@ -25,7 +27,10 @@ router
   .get(getCustomersList)
   .post(schemaValidation(createCustomerSchema), createCustomer);
 
-router.route("/users").post(schemaValidation(createUserSchema), createUser);
+router
+  .route("/users")
+  // .post(schemaValidation(createUserSchema), createUser)
+  .get(adminProtect, getAllUsers);
 
 router.route("/broker/login-url").get(getAuthUrl);
 

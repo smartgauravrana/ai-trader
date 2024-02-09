@@ -4,6 +4,27 @@ import { UserModel } from "../../models/User";
 import type { UpdateUserRequest } from "./schema";
 import { NotFound, Forbidden } from "http-errors";
 import asyncHandler from "../../utils/asyncHandler";
+import jwt from "jsonwebtoken";
+
+interface DecodedToken {
+  exp: number;
+}
+
+export function isTokenExpired(token: string): boolean {
+  try {
+    const decodedToken = jwt.decode(token) as DecodedToken;
+    if (!decodedToken) {
+      // Token is not valid or malformed
+      return true;
+    }
+    const expirationTime = decodedToken.exp * 1000; // Convert seconds to milliseconds
+    const currentTime = Date.now();
+    return currentTime >= expirationTime;
+  } catch (error: any) {
+    console.error("Error decoding token:", error.message);
+    return true; // Assume token is expired if there's an error
+  }
+}
 
 export async function createUser(
   req: Request<{}, {}, CreateUserRequest>,
@@ -43,12 +64,23 @@ export async function updateProfile(
 export const getCurrentUser = asyncHandler(
   async (req: Request, res: Response) => {
     const user = await UserModel.findById(req.user?._id);
+
+    const accessTknExpired = isTokenExpired(user?.metadata?.accessToken || "");
+
     if (!user) {
       throw NotFound("User not found");
     }
 
     res.success({
-      data: user,
+      data: { ...user, isTokenExpired: accessTknExpired },
     });
   }
 );
+
+export const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
+  const data = await UserModel.find({}).sort({ createdAt: -1 }).lean();
+
+  res.success({
+    data,
+  });
+});

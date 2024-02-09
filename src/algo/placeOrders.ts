@@ -24,8 +24,9 @@ export async function placeOrders(contract: Contract, aiResponse: AIResponse) {
   const users = await UserModel.find({
     "metadata.accessToken": { $exists: true },
   }).lean();
-  const { results, errors } = await PromisePool.for(users).process(
-    async (user: User) => {
+  const { results, errors } = await PromisePool.for(users)
+    .withConcurrency(20)
+    .process(async (user: User) => {
       const accessToken = user.metadata?.accessToken;
       if (!user.metadata || !accessToken) {
         return;
@@ -85,8 +86,7 @@ export async function placeOrders(contract: Contract, aiResponse: AIResponse) {
           aiResponse.ltp
         } `);
       }
-    }
-  );
+    });
 
   logger.info({ results, errors }, "Place Order fn ended");
 }
