@@ -54,7 +54,7 @@ app.use(errorHandler);
 connectToDB()
   .then(() => {
     app.listen(port, "0.0.0.0", () => {
-      logger.info(`Listening on port ${port}...`);
+      logger.info(`Listening on port ${port}... 🚀`);
     });
   })
   .catch((err) => console.log("err: ", err));
