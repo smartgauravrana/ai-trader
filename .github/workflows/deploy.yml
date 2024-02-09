@@ -39,6 +39,8 @@ jobs:
           echo MONGODB_URI=${{ secrets.MONGODB_URI}} >> .env
           echo JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY}} >> .env
           echo WEBAPP_URL=${{ secrets.WEBAPP_URL}} >> .env
+          echo "Printing .env"
+          cat .env
       # - name: Build the project
       #   run: yarn build
       - name: Listing files and remove node_modules
