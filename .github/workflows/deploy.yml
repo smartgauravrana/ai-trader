@@ -54,9 +54,8 @@ jobs:
           ssh -y root@${{ secrets.SSH_HOST }} 'cd ~/app/ai-trader && echo'
           # echo 'Installing dependencies'
           ssh -y root@${{ secrets.SSH_HOST }} 'cd ~/app/ai-trader && bun install'
-          ssh -y root@*** 'pm2 stop bunapi'
           # echo 'Starting pm2 app'
-          ssh -y root@${{ secrets.SSH_HOST }} 'cd ~/app/ai-trader && pm2 start --interpreter ~/.bun/bin/bun index.ts --name bunapi'
+          ssh -y root@${{ secrets.SSH_HOST }} 'cd ~/app/ai-trader && pm2 pm2 restart bunapi --update-env'
           ssh -y root@${{ secrets.SSH_HOST }} 'pm2 startup systemd'
           ssh -y root@${{ secrets.SSH_HOST }} 'pm2 save'
       - name: Setup finish
