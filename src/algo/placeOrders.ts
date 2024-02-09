@@ -12,7 +12,7 @@ import { logger } from "../logger";
 import type { AIResponse } from "../ai";
 import { sendMessageToChannel } from "../telegram/bot";
 
-const { REDIRECT_URL, TRADE_QTY } = process.env;
+const { REDIRECT_URL } = process.env;
 const completedOrderStatus = [
   ORDER_STATUS.Pending,
   ORDER_STATUS.TradedOrFilled,
@@ -30,7 +30,7 @@ export async function placeOrders(contract: Contract, aiResponse: AIResponse) {
       if (!user.metadata || !accessToken) {
         return;
       }
-      const { fyersAppId } = user.metadata;
+      const { fyersAppId, tradeQty } = user.metadata;
       const FyersAPI = require("fyers-api-v3").fyersModel;
       const fyers = new FyersAPI();
       fyers.setAppId(fyersAppId);
@@ -65,7 +65,7 @@ export async function placeOrders(contract: Contract, aiResponse: AIResponse) {
       // if not, then create a new order with 30 point SL, and 50 point target.
       const orderRequest: OrderRequest = {
         symbol: contract.symbol,
-        qty: TRADE_QTY ? Number(TRADE_QTY) : 0, // TODO change dynamically
+        qty: tradeQty, // TODO change dynamically
         limitPrice: aiResponse.ltp + 1,
         stopPrice: aiResponse.ltp,
         stopLoss: 31,
