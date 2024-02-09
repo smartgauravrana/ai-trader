@@ -47,15 +47,15 @@ jobs:
           rm -rf node_modules
       - name: Deploy with rsync
         run: |
-          rsync -avz * root@${{ secrets.SSH_HOST }}:./app/ai-trader-helper
-          rsync -avz .env root@${{ secrets.SSH_HOST }}:./app/ai-trader-helper
+          rsync -avz * root@${{ secrets.SSH_HOST }}:./app/ai-trader
+          rsync -avz .env root@${{ secrets.SSH_HOST }}:./app/ai-trader
       - name: Executing cmd on remote
         run: |
-          ssh -y root@${{ secrets.SSH_HOST }} 'cd ~/app/ai-trade-helper && echo'
+          ssh -y root@${{ secrets.SSH_HOST }} 'cd ~/app/ai-trader && echo'
           # echo 'Installing dependencies'
-          ssh -y root@${{ secrets.SSH_HOST }} 'cd ~/app/ai-trade-helper && bun install'
+          ssh -y root@${{ secrets.SSH_HOST }} 'cd ~/app/ai-trader && bun install'
           # echo 'Starting pm2 app'
-          ssh -y root@${{ secrets.SSH_HOST }} 'cd ~/app/ai-trade-helper && pm2 start --interpreter ~/.bun/bin/bun index.ts --name bunapi'
+          ssh -y root@${{ secrets.SSH_HOST }} 'cd ~/app/ai-trader && pm2 start --interpreter ~/.bun/bin/bun index.ts --name bunapi'
           ssh -y root@${{ secrets.SSH_HOST }} 'pm2 startup systemd'
           ssh -y root@${{ secrets.SSH_HOST }} 'pm2 save'
       - name: Setup finish
