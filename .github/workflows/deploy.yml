@@ -55,7 +55,7 @@ jobs:
           # echo 'Installing dependencies'
           ssh -y root@${{ secrets.SSH_HOST }} 'cd ~/app/ai-trader && bun install'
           # echo 'Starting pm2 app'
-          ssh -y root@${{ secrets.SSH_HOST }} 'cd ~/app/ai-trader && pm2 pm2 restart bunapi --update-env'
+          ssh -y root@${{ secrets.SSH_HOST }} 'cd ~/app/ai-trader && pm2 restart bunapi --update-env'
           ssh -y root@${{ secrets.SSH_HOST }} 'pm2 startup systemd'
           ssh -y root@${{ secrets.SSH_HOST }} 'pm2 save'
       - name: Setup finish
