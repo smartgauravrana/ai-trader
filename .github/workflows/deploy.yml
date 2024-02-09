@@ -1,5 +1,8 @@
 name: Backend deploy Job
-on: [push]
+on:
+  push:
+    branches:
+      - main
 jobs:
   build-app:
     runs-on: ubuntu-latest
