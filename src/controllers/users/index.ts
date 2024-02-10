@@ -63,7 +63,7 @@ export async function updateProfile(
 
 export const getCurrentUser = asyncHandler(
   async (req: Request, res: Response) => {
-    const user = await UserModel.findById(req.user?._id);
+    const user = await UserModel.findById(req.user?._id).lean();
 
     const accessTknExpired = isTokenExpired(user?.metadata?.accessToken || "");
 
