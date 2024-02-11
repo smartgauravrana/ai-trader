@@ -46,7 +46,7 @@ export async function updateProfile(
     return next(Forbidden());
   }
 
-  const { metadata } = req.body;
+  const { metadata, email } = req.body;
 
   const user = await UserModel.findById(userId);
   if (!user) {
@@ -54,6 +54,7 @@ export async function updateProfile(
   }
   user.metadata = {
     ...(user?.metadata || {}),
+    email: email || user.email,
     ...metadata,
   } as any;
 
@@ -65,14 +66,16 @@ export const getCurrentUser = asyncHandler(
   async (req: Request, res: Response) => {
     const user = await UserModel.findById(req.user?._id).lean();
 
-    const accessTknExpired = isTokenExpired(user?.metadata?.accessToken || "");
+    const refreshTknExpired = isTokenExpired(
+      user?.metadata?.refreshToken || ""
+    );
 
     if (!user) {
       throw NotFound("User not found");
     }
 
     res.success({
-      data: { ...user, isTokenExpired: accessTknExpired },
+      data: { ...user, isTokenExpired: refreshTknExpired },
     });
   }
 );

@@ -39,6 +39,8 @@ jobs:
           echo TELEGRAM_LISTENER_HEARTBEAT=${{ secrets.TELEGRAM_LISTENER_HEARTBEAT}} >> .env
           echo JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY}} >> .env
           echo WEBAPP_URL=${{ secrets.WEBAPP_URL}} >> .env
+          echo BREVO_API_KEY=${{ secrets.BREVO_API_KEY}} >> .env
+          echo EMAIL_DOMAIN=${{ secrets.EMAIL_DOMAIN}} >> .env
           echo "Printing .env"
           cat .env
       # - name: Build the project

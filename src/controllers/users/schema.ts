@@ -19,6 +19,7 @@ const UpdateUserRequestSchema = z.object({
     fyersId: z.string(),
     fyersAppId: z.string(),
     fyersSecretId: z.string(),
+    pin: z.string(),
   }),
 });
 

@@ -1,9 +1,24 @@
 import { type Response, type Request, type NextFunction } from "express";
+import fetch from "node-fetch";
 import { UserModel } from "../../models/User";
 import { Forbidden } from "http-errors";
 import { logger } from "../../logger";
 
 const { REDIRECT_URL, WEBAPP_URL } = process.env;
+
+interface RefreshTokenRequest {
+  appId: string;
+  appSecret: string;
+  refresh_token: string;
+  pin: string;
+}
+
+interface TokenResponse {
+  s: string;
+  code: number;
+  message: string;
+  access_token?: string;
+}
 
 export async function getAuthUrl(
   req: Request,
@@ -62,4 +77,45 @@ export async function handleRedirectUri(req: Request, res: Response) {
   }
 
   res.redirect(WEBAPP_URL! + "?success=true");
+}
+
+export async function validateRefreshToken(
+  tokenRequest: RefreshTokenRequest
+): Promise<TokenResponse> {
+  try {
+    const response = await fetch(
+      "https://api-t1.fyers.in/api/v3/validate-refresh-token",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          grant_type: "refresh_token",
+          appIdHash: getAppIdHash(tokenRequest.appId, tokenRequest.appSecret),
+          refresh_token: tokenRequest.refresh_token,
+          pin: tokenRequest.pin,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to validate refresh token: ${response.statusText}`
+      );
+    }
+
+    const responseData = await response.json();
+    return responseData as TokenResponse;
+  } catch (error: any) {
+    console.error("Error validating refresh token:", error.message);
+    throw error;
+  }
+}
+
+function getAppIdHash(appId: string, appSecret: string) {
+  const hasher = new Bun.CryptoHasher("sha256");
+
+  hasher.update(appId + ":" + appSecret);
+  return hasher.digest().toString();
 }

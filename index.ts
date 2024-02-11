@@ -16,7 +16,9 @@ import { handleTokenRefresh } from "./src/jobs/tokenRefresh";
 const port = 3001;
 const app = express();
 
-cron.schedule("59 23 * * *", handleTokenRefresh);
+//
+// 7pm IST
+cron.schedule("30 13 * * *", handleTokenRefresh);
 
 app.use(express.json());
 app.use(successHandler);

@@ -16,6 +16,9 @@ export class UserMetadata {
   @prop({ required: true })
   fyersSecretId!: string;
 
+  @prop({ required: true })
+  pin!: string;
+
   @prop()
   botToken?: string;
 
