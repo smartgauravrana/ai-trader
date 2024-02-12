@@ -17,29 +17,23 @@ export enum ORDER_STATUS {
   Expired = 7,
 }
 
-// export function getProfileData(fyers: any) {
-//     fyers.get_profile().then((response) => {
-//         console.log(response)
-//     }).catch((err) => {
-//         console.log(err)
-//     })
-// }
+export interface FyersApiResponse<T> {
+  code: number;
+  message: string;
+  s: string;
+  [key: string]: T | number | string;
+}
 
-// export function getQuotes(fyers: any) {
-//     fyers.getQuotes(["NSE:SBIN-EQ", "NSE:TCS-EQ"]).then((response) => {
-//         console.log(response)
-//     }).catch((err) => {
-//         console.log(err)
-//     })
-// }
+interface FundLimitResponse extends FyersApiResponse<FyersFundDetails[]> {
+  fund_limit: FyersFundDetails[];
+}
 
-// export function getMarketDepth() {
-//     fyers.getMarketDepth({ "symbol": ["NSE:SBIN-EQ", "NSE:TCS-EQ"], "ohlcv_flag": 1 }).then((response) => {
-//         console.log(response)
-//     }).catch((err) => {
-//         console.log(err)
-//     })
-// }
+export type FyersFundDetails = {
+  id: number;
+  title: string;
+  equityAmount: number;
+  commodityAmount: number;
+};
 
 export function placeOrder(
   fyers: any,
@@ -68,7 +62,7 @@ export function getNetPositions(fyers: any): Promise<any> {
   return fyers.get_positions();
 }
 
-export function getFundsDetails(fyers: any): Promise<any> {
+export function getFundsDetails(fyers: any): Promise<FundLimitResponse> {
   return fyers.get_funds();
 }
 

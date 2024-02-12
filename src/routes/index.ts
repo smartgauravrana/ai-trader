@@ -17,7 +17,7 @@ import {
 } from "../controllers/users/index.ts";
 import { getAuthUrl, handleRedirectUri } from "../controllers/fyers/index.ts";
 
-import { inviteUser } from "../controllers/admin/index.ts";
+import { getDashboardData, inviteUser } from "../controllers/admin/index.ts";
 import { adminProtect } from "../middleware/adminProtect.ts";
 
 const router = Router({ mergeParams: true });
@@ -36,7 +36,9 @@ router.route("/broker/login-url").get(getAuthUrl);
 
 router.route("/redirect-fyers").get(handleRedirectUri);
 
+// Admin routes
 router.route("/admin/invite-user").post(inviteUser);
+router.route("/admin/dashboard").get(adminProtect, getDashboardData);
 
 // Users
 router.route("/users/me").get(getCurrentUser);
