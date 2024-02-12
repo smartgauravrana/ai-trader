@@ -83,12 +83,20 @@ export const getDashboardData = asyncHandler(
         return response;
       });
 
+    console.log("result, errors", {
+      results,
+      errors,
+    });
+
     let totalBal = 0;
     let highestFunds = 0;
     results.forEach((item) => {
       totalBal += item?.totalBalance;
       highestFunds = Math.max(highestFunds, item?.totalBalance);
     });
+
+    resultRes.totalFunds = totalBal;
+    resultRes.highestActiveFund = highestFunds;
 
     res.success({
       data: resultRes,
