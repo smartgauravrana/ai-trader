@@ -54,10 +54,10 @@ export async function updateProfile(
   }
   user.metadata = {
     ...(user?.metadata || {}),
-    email: email || user.email,
+
     ...metadata,
   } as any;
-
+  user.email = email || user.email;
   await user.save();
   res.success({ data: user });
 }
