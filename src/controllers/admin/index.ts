@@ -6,6 +6,7 @@ import asyncHandler from "../../utils/asyncHandler";
 import type { DashboardData } from "../../dto/dashboard";
 import { isTokenExpired } from "../users";
 import { getFundsDetails } from "../../broker/fyers";
+import { FundTsModel } from "../../models/FundTs";
 
 const { REDIRECT_URL } = process.env;
 
@@ -35,6 +36,7 @@ export const getDashboardData = asyncHandler(
       highestActiveFund: 0,
       totalFunds: 0,
       userCountWithExpiredRefreshToken: 0,
+      fundsTs: [],
     };
     const usersCount = await UserModel.countDocuments({});
 
@@ -83,21 +85,24 @@ export const getDashboardData = asyncHandler(
         return response;
       });
 
-    console.log("result, errors", {
-      results,
-      errors,
-    });
-
     let totalBal = 0;
     let highestFunds = 0;
+    let activeUsers = 0;
     results.forEach((item) => {
-      totalBal += item?.totalBalance;
+      totalBal += item.totalBalance;
       highestFunds = Math.max(highestFunds, item?.totalBalance);
+      activeUsers += item.totalBalance ? 1 : 0;
     });
 
     resultRes.totalFunds = totalBal;
     resultRes.highestActiveFund = highestFunds;
+    resultRes.activeUsers = activeUsers;
 
+    const fundTs = await FundTsModel.find()
+      .sort({ createdAt: -1 })
+      .limit(30)
+      .lean();
+    resultRes.fundsTs = fundTs;
     res.success({
       data: resultRes,
     });

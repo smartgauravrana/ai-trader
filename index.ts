@@ -10,16 +10,10 @@ import { authenticateJWT } from "./src/middleware/authenticate";
 import { loginHandler, logout } from "./src/controllers/auth";
 import { successHandler } from "./src/middleware/successHandler";
 import { errorHandler } from "./src/middleware/errorHandler";
-import cron from "node-cron";
-import { handleTokenRefresh } from "./src/jobs/tokenRefresh";
+import "./src/jobs";
 
 const port = 3001;
 const app = express();
-
-// 8am IST
-cron.schedule("30 2 * * *", handleTokenRefresh);
-// 7pm IST
-cron.schedule("30 13 * * *", handleTokenRefresh);
 
 app.use(express.json());
 app.use(successHandler);

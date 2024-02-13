@@ -1,3 +1,5 @@
+import type { FundTs } from "../models/FundTs";
+
 export interface DashboardData {
   usersCount: number;
   usersOnboarded: number;
@@ -5,4 +7,5 @@ export interface DashboardData {
   activeUsers: number;
   totalFunds: number;
   highestActiveFund: number;
+  fundsTs: FundTs[];
 }
