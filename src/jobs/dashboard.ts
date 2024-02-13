@@ -4,10 +4,12 @@ import { User, UserModel } from "../models/User";
 import { isTokenExpired } from "../controllers/users";
 import { getFundsDetails } from "../broker/fyers";
 import { getCurrentDate } from "../utils";
+import { logger } from "../logger";
 
 const { REDIRECT_URL } = process.env;
 
 export async function aggregateFundsData() {
+  logger.info("aggregate job started");
   const users = await UserModel.find({
     "metadata.accessToken": { $exists: true },
   }).lean();
@@ -44,6 +46,8 @@ export async function aggregateFundsData() {
       return response;
     });
 
+  logger.info({ results, errors }, "aggregate jon promise res");
+
   const aggregateInfo = {
     amount: 0,
     date: new Date(),
@@ -54,4 +58,5 @@ export async function aggregateFundsData() {
   });
   aggregateInfo.date = new Date(getCurrentDate());
   await FundTsModel.create();
+  logger.info("aggregate job completed");
 }
