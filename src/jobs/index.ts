@@ -8,4 +8,4 @@ cron.schedule("30 2 * * *", handleTokenRefresh);
 cron.schedule("30 13 * * *", handleTokenRefresh);
 
 // 10 pm IST
-cron.schedule("30 17 * * *", aggregateFundsData);
+cron.schedule("30 14 * * *", aggregateFundsData);
