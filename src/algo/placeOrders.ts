@@ -31,6 +31,14 @@ export async function placeOrders(contract: Contract, aiResponse: AIResponse) {
       if (!user.metadata || !accessToken) {
         return;
       }
+
+      if (user.metadata.pauseTrades) {
+        logger.info(
+          { userId: user._id.toString(), name: user.name },
+          "Trades paused"
+        );
+        return;
+      }
       const { fyersAppId, tradeQty } = user.metadata;
       const FyersAPI = require("fyers-api-v3").fyersModel;
       const fyers = new FyersAPI();

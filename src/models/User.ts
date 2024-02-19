@@ -42,6 +42,9 @@ export class UserMetadata {
 
   @prop()
   refreshToken?: string;
+
+  @prop({ default: false })
+  pauseTrades?: boolean;
 }
 
 @modelOptions({ schemaOptions: { timestamps: true } })

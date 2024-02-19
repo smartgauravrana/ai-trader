@@ -20,6 +20,7 @@ const UpdateUserRequestSchema = z.object({
     fyersAppId: z.string(),
     fyersSecretId: z.string(),
     pin: z.string(),
+    pauseTrades: z.boolean().optional(),
   }),
 });
 
