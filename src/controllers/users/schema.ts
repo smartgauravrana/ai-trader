@@ -15,13 +15,15 @@ export const createUserSchema = z.object({
 const UpdateUserRequestSchema = z.object({
   name: z.string().optional(),
   email: z.string().email().optional(),
-  metadata: z.object({
-    fyersId: z.string(),
-    fyersAppId: z.string(),
-    fyersSecretId: z.string(),
-    pin: z.string(),
-    pauseTrades: z.boolean().optional(),
-  }),
+  pauseTrades: z.boolean().optional(),
+  metadata: z
+    .object({
+      fyersId: z.string(),
+      fyersAppId: z.string(),
+      fyersSecretId: z.string(),
+      pin: z.string(),
+    })
+    .optional(),
 });
 
 export type UpdateUserRequest = z.infer<typeof UpdateUserRequestSchema>;

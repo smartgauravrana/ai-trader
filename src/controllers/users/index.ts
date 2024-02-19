@@ -46,7 +46,7 @@ export async function updateProfile(
     return next(Forbidden());
   }
 
-  const { metadata, email } = req.body;
+  const { metadata, email, pauseTrades } = req.body;
 
   const user = await UserModel.findById(userId);
   if (!user) {
@@ -55,7 +55,8 @@ export async function updateProfile(
   user.metadata = {
     ...(user?.metadata || {}),
 
-    ...metadata,
+    ...(metadata || {}),
+    ...(pauseTrades !== undefined ? { pauseTrades } : {}),
   } as any;
   user.email = email || user.email;
   await user.save();
