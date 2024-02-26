@@ -78,7 +78,7 @@ export async function placeOrders(contract: Contract, aiResponse: AIResponse) {
         limitPrice: aiResponse.ltp + 1,
         stopPrice: aiResponse.ltp,
         stopLoss: 31,
-        takeProfit: 35,
+        takeProfit: 40,
       };
       const res = await placeOrder(fyers, orderRequest);
       logger.info(
