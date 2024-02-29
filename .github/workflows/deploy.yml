@@ -21,11 +21,11 @@ jobs:
       - name: Creating .env file
         run: |
           echo API_KEY=${{ secrets.API_KEY}} >> .env
-          echo FYERS_ID=${{ secrets.FYERS_ID}} >> .env
-          echo FYERS_APP_ID=${{ secrets.FYERS_APP_ID}} >> .env
-          echo FYERS_SECRET_ID=${{ secrets.FYERS_SECRET_ID}} >> .env
-          echo TOTP_KEY=${{ secrets.TOTP_KEY}} >> .env
-          echo FYERS_PIN=${{ secrets.FYERS_PIN}} >> .env
+          # echo FYERS_ID=${{ secrets.FYERS_ID}} >> .env
+          # echo FYERS_APP_ID=${{ secrets.FYERS_APP_ID}} >> .env
+          # echo FYERS_SECRET_ID=${{ secrets.FYERS_SECRET_ID}} >> .env
+          # echo TOTP_KEY=${{ secrets.TOTP_KEY}} >> .env
+          # echo FYERS_PIN=${{ secrets.FYERS_PIN}} >> .env
           echo REDIRECT_URL=${{ secrets.REDIRECT_URL}} >> .env
           echo TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN}} >> .env
           echo MYSTIC_CHANNEL_ID=${{ secrets.MYSTIC_CHANNEL_ID}} >> .env
