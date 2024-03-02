@@ -1,3 +1,5 @@
+import { LOT_SIZE } from "../constants";
+
 export type OrderRequest = {
   symbol: string;
   qty: number;
@@ -41,9 +43,15 @@ export function placeOrder(
 ): Promise<any> {
   const { symbol, qty, limitPrice, stopLoss, takeProfit, stopPrice } =
     createOrderReq;
-  const reqBody = {
+
+  const orders = [];
+  const totalLots = qty / LOT_SIZE;
+  const bracketOrderLots = totalLots === 1 ? 1 : Math.floor(totalLots / 2);
+  const coverOrderLots = totalLots - bracketOrderLots;
+
+  const bracketOrder = {
     symbol,
-    qty,
+    qty: bracketOrderLots * LOT_SIZE,
     type: 4,
     side: 1, // buy
     productType: "BO",
@@ -55,7 +63,44 @@ export function placeOrder(
     stopLoss,
     takeProfit,
   };
-  return fyers.place_order(reqBody);
+  orders.push(bracketOrder);
+
+  if (coverOrderLots > 0) {
+    // create CO order as well
+    const coverOrder = {
+      symbol,
+      qty: coverOrderLots * LOT_SIZE,
+      type: 4,
+      side: 1, // buy
+      productType: "CO",
+      limitPrice,
+      stopPrice,
+      disclosedQty: 0,
+      validity: "DAY",
+      offlineOrder: false,
+      stopLoss: 30,
+    };
+    orders.push(coverOrder);
+  }
+
+  // add logic if lot size more than 1
+  // const reqBody = {
+  //   symbol,
+  //   qty,
+  //   type: 4,
+  //   side: 1, // buy
+  //   productType: "BO",
+  //   limitPrice,
+  //   stopPrice,
+  //   disclosedQty: 0,
+  //   validity: "DAY",
+  //   offlineOrder: false,
+  //   stopLoss,
+  //   takeProfit,
+  // };
+  return Promise.allSettled(
+    orders.map((orderReq) => fyers.place_order(orderReq))
+  );
 }
 
 export function getNetPositions(fyers: any): Promise<any> {

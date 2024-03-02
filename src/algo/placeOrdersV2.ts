@@ -21,7 +21,10 @@ const completedOrderStatus = [
   ORDER_STATUS.Transit,
 ];
 
-export async function placeOrders(contract: Contract, aiResponse: AIResponse) {
+export async function placeOrdersV2(
+  contract: Contract,
+  aiResponse: AIResponse
+) {
   logger.info("Place Order fn started");
   const users = await UserModel.find({
     "metadata.accessToken": { $exists: true },
@@ -90,8 +93,10 @@ export async function placeOrders(contract: Contract, aiResponse: AIResponse) {
 
       const limitPrice = aiResponse.ltp + 1;
       const qty = getQuantitiesFromAvailableBalance(
-        availableBalance,
-        limitPrice
+        // availableBalance,
+        // limitPrice,
+        36666,
+        400
       );
 
       logger.info(
@@ -118,7 +123,7 @@ export async function placeOrders(contract: Contract, aiResponse: AIResponse) {
       const orderRequest: OrderRequest = {
         symbol: contract.symbol,
         qty, // TODO change dynamically
-        limitPrice: aiResponse.ltp + 1,
+        limitPrice,
         stopPrice: aiResponse.ltp,
         stopLoss: 31,
         takeProfit: 58,
