@@ -51,7 +51,8 @@ export function placeOrder(
 
   const bracketOrder = {
     symbol,
-    qty: bracketOrderLots * LOT_SIZE,
+    // qty: bracketOrderLots * LOT_SIZE,// TODO
+    qty: totalLots * LOT_SIZE,
     type: 4,
     side: 1, // buy
     productType: "BO",
@@ -65,23 +66,23 @@ export function placeOrder(
   };
   orders.push(bracketOrder);
 
-  if (coverOrderLots > 0) {
-    // create CO order as well
-    const coverOrder = {
-      symbol,
-      qty: coverOrderLots * LOT_SIZE,
-      type: 4,
-      side: 1, // buy
-      productType: "CO",
-      limitPrice,
-      stopPrice,
-      disclosedQty: 0,
-      validity: "DAY",
-      offlineOrder: false,
-      stopLoss: 30,
-    };
-    orders.push(coverOrder);
-  }
+  // if (coverOrderLots > 0) {
+  //   // create CO order as well
+  //   const coverOrder = {
+  //     symbol,
+  //     qty: coverOrderLots * LOT_SIZE,
+  //     type: 4,
+  //     side: 1, // buy
+  //     productType: "CO",
+  //     limitPrice,
+  //     stopPrice,
+  //     disclosedQty: 0,
+  //     validity: "DAY",
+  //     offlineOrder: false,
+  //     stopLoss: 30,
+  //   };
+  //   orders.push(coverOrder);
+  // }
 
   // add logic if lot size more than 1
   // const reqBody = {
