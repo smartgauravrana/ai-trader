@@ -12,7 +12,13 @@ import {
 import { logger } from "../logger";
 import type { AIResponse } from "../ai";
 import { sendMessageToChannel } from "../telegram/bot";
-import { AVAILABLE_BALANCE_ID, LOT_SIZE } from "../constants";
+import {
+  AVAILABLE_BALANCE_ID,
+  DEFAULT_SL,
+  LOT_SIZE,
+  TAKE_PROFIT,
+} from "../constants";
+import memCache from "../utils/mem-cache";
 
 const { REDIRECT_URL } = process.env;
 const completedOrderStatus = [
@@ -93,10 +99,8 @@ export async function placeOrdersV2(
 
       const limitPrice = aiResponse.ltp + 1;
       const qty = getQuantitiesFromAvailableBalance(
-        // availableBalance,
-        // limitPrice,
-        36666,
-        400
+        availableBalance,
+        limitPrice
       );
 
       logger.info(
@@ -125,14 +129,20 @@ export async function placeOrdersV2(
         qty, // TODO change dynamically
         limitPrice,
         stopPrice: aiResponse.ltp,
-        stopLoss: 31,
-        takeProfit: 58,
+        stopLoss: DEFAULT_SL,
+        takeProfit: TAKE_PROFIT,
       };
       const res = await placeOrder(fyers, orderRequest);
       logger.info(
         { orderRes: res, userId: user._id.toString(), name: user.name },
         "Order placed"
       );
+
+      const coOrder: any = res[1]?.value || null;
+
+      if (coOrder) {
+        memCache.set(`CO:${user._id.toString()}`, coOrder.id);
+      }
 
       if (user.isAdmin) {
         await sendMessageToChannel(`Trade Execution ${

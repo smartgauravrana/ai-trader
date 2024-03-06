@@ -1,11 +1,22 @@
 import { askAI } from "../ai";
 
 import { logger } from "../logger";
-import { downloadOptionContracts, findContract } from "../optionContracts";
+import {
+  type Contract,
+  downloadOptionContracts,
+  findContract,
+} from "../optionContracts";
 
 import cache, { getKey } from "../utils/cache";
+import memCache from "../utils/mem-cache";
+import startListenData, { isSocketConnected } from "../ws";
 import { placeOrders } from "./placeOrders";
+import { placeOrdersV2 } from "./placeOrdersV2";
 const { MYSTIC_CHANNEL_ID } = process.env;
+
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 export default async function runAlgo() {
   // process message with AI LLM
@@ -36,6 +47,21 @@ export default async function runAlgo() {
   }
   logger.info({ contract }, "contract found!");
 
+  await memCache.set<Contract>("contract", contract, 7 * 60 * 60); // 7 hours expiry
+
+  // start socket listener
+  if (!(await isSocketConnected())) {
+    await startListenData();
+  }
+
+  await delay(2500);
+  let isConnected = await isSocketConnected();
+  logger.info({ isConnected }, "Socket connection status: ");
+
   // place order for each customer
-  await placeOrders(contract, aiResponse);
+  if (isConnected) {
+    await placeOrdersV2(contract, aiResponse);
+  } else {
+    await placeOrders(contract, aiResponse);
+  }
 }

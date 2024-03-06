@@ -11,6 +11,7 @@ import { loginHandler, logout } from "./src/controllers/auth";
 import { successHandler } from "./src/middleware/successHandler";
 import { errorHandler } from "./src/middleware/errorHandler";
 import "./src/jobs";
+// import "./src/ws";
 
 const port = 3001;
 const app = express();
