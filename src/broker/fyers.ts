@@ -1,5 +1,12 @@
 import { LOT_SIZE } from "../constants";
 
+export type ModifyRequest = {
+  id: string;
+  type: number;
+  stopPrice: number;
+  limitPrice: number;
+};
+
 export type OrderRequest = {
   symbol: string;
   qty: number;
@@ -114,6 +121,13 @@ export function getFundsDetails(fyers: any): Promise<FundLimitResponse> {
 
 export function getAllOrders(fyers: any): Promise<any> {
   return fyers.get_orders();
+}
+
+export function modifyOrder(
+  fyers: any,
+  modifyRequest: ModifyRequest
+): Promise<any> {
+  return fyers.modify_order(modifyRequest);
 }
 
 // fyers.get_profile().then((response) => {

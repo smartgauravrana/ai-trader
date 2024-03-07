@@ -19,6 +19,7 @@ import {
   TAKE_PROFIT,
 } from "../constants";
 import memCache from "../utils/mem-cache";
+import { safeMemCacheSet } from "../utils";
 
 const { REDIRECT_URL } = process.env;
 const completedOrderStatus = [
@@ -138,11 +139,15 @@ export async function placeOrdersV2(
         "Order placed"
       );
 
-      const coOrder: any = res[1]?.value || null;
+      // const coOrder: any = res[1]?.value || null;
 
-      if (coOrder) {
-        memCache.set(`CO:${user._id.toString()}`, coOrder.id);
-      }
+      // if (coOrder) {
+      //   safeMemCacheSet<string>(
+      //     `CO:${user._id.toString()}`,
+      //     coOrder.id,
+      //     7 * 60 * 60
+      //   );
+      // }
 
       if (user.isAdmin) {
         await sendMessageToChannel(`Trade Execution ${
