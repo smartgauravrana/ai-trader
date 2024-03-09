@@ -3,7 +3,7 @@ import { isTokenExpired } from "../controllers/users";
 import { logger } from "../logger";
 import { UserModel } from "../models/User";
 import memCache from "../utils/mem-cache";
-import { ORDER_TYPES, TAKE_PROFIT } from "../constants";
+import { ORDER_TYPES, SL_GAP_LIMIT, TAKE_PROFIT } from "../constants";
 import { getAllOrders, modifyOrder } from "../broker/fyers";
 import { KEYS } from "../constants/cacheKeys";
 import type { CurrentTrade } from "../algo";
@@ -21,45 +21,66 @@ type UserIdWithToken = {
 
 let fyersdata: any = null;
 
-async function processMsg(ltp: number) {
-  logger.info("ltp: " + ltp);
-
-  const currentTrade = memCache.get<CurrentTrade>(KEYS.CURRENT_TRADE);
+export async function getUpdatedSLPrice(
+  ltp: number,
+  currentTrade?: CurrentTrade
+): Promise<number | null> {
   if (!currentTrade?.contract) {
     logger.info("SOCKET: no contract in memcache");
-    return;
+    return null;
   }
 
   if (!currentTrade.aiResponse) {
     logger.info("SOCKET: processMsg no ai response");
-    return;
+    return null;
   }
-  const { aiResponse, contract } = currentTrade;
-  const limitPrice = aiResponse.ltp + TAKE_PROFIT;
 
-  const lastSL = memCache.get<number>("lastSL");
+  const { aiResponse } = currentTrade;
+  const targetPrice = aiResponse.ltp + TAKE_PROFIT;
 
-  if (!lastSL && ltp < limitPrice) {
-    return;
+  const lastSL = memCache.get<number>(KEYS.LAST_SL);
+
+  if (!lastSL && ltp < targetPrice) {
+    return null;
   }
 
   let newSL: number | null = null;
 
-  if (!lastSL && ltp > limitPrice + 15) {
-    // update lastSL
-    await safeMemCacheSet<number>(KEYS.LAST_SL, limitPrice, 7 * 60 * 60);
-    newSL = limitPrice;
+  if (!lastSL && ltp >= targetPrice) {
+    // update lastSL to Cost to Cost
+    newSL = aiResponse.ltp + Math.floor(TAKE_PROFIT / 2); // target: 430, sl: 415
+    await safeMemCacheSet<number>(KEYS.LAST_SL, newSL, 7 * 60 * 60);
   }
 
-  if (lastSL && ltp > lastSL + 30) {
-    newSL = ltp + 10;
+  if (lastSL && ltp - lastSL > SL_GAP_LIMIT) {
+    const diffLtpLastSL = ltp - lastSL;
+    newSL = lastSL + (diffLtpLastSL - SL_GAP_LIMIT);
   }
 
   if (!newSL) {
     logger.info("SOCKET: No SL to update");
+    return newSL;
+  }
+
+  return newSL;
+}
+
+export async function processLtpMsg(ltp: number) {
+  logger.info("ltp: " + ltp);
+
+  const currentTrade = memCache.get<CurrentTrade>(KEYS.CURRENT_TRADE);
+
+  if (!currentTrade) {
     return;
   }
 
+  const newSL = getUpdatedSLPrice(ltp, currentTrade);
+  if (!newSL) {
+    logger.info("No need of SL to update");
+    return;
+  }
+
+  const { contract } = currentTrade;
   const users =
     memCache.get<UserIdWithToken[]>(KEYS.ALL_USER_IDS_WITH_TOKEN) || [];
   const { results, errors } = await PromisePool.for(users)
@@ -90,7 +111,7 @@ async function processMsg(ltp: number) {
       // update SL order with price plus 15
 
       if (!COSellOrderId) {
-        logger.info("No sell order of CO type");
+        logger.info({ userId: id }, "No sell order of CO type");
         return;
       }
 
@@ -157,7 +178,7 @@ export default async function startListenData() {
       return;
     }
 
-    processMsg(ltp);
+    processLtpMsg(ltp);
   }
 
   function onerror(err: unknown) {

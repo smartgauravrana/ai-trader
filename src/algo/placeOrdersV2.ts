@@ -30,14 +30,15 @@ const completedOrderStatus = [
 
 export async function placeOrdersV2(
   contract: Contract,
-  aiResponse: AIResponse
+  aiResponse: AIResponse,
+  splitOrders: boolean
 ) {
   logger.info("Place Order fn started");
   const users = await UserModel.find({
     "metadata.accessToken": { $exists: true },
   }).lean();
   const { results, errors } = await PromisePool.for(users)
-    .withConcurrency(20)
+    .withConcurrency(25)
     .process(async (user: User) => {
       const accessToken = user.metadata?.accessToken;
       if (!user.metadata || !accessToken) {
@@ -51,7 +52,7 @@ export async function placeOrdersV2(
         );
         return;
       }
-      const { fyersAppId, tradeQty } = user.metadata;
+      const { fyersAppId } = user.metadata;
       const FyersAPI = require("fyers-api-v3").fyersModel;
       const fyers = new FyersAPI();
       fyers.setAppId(fyersAppId);
@@ -133,21 +134,11 @@ export async function placeOrdersV2(
         stopLoss: DEFAULT_SL,
         takeProfit: TAKE_PROFIT,
       };
-      const res = await placeOrder(fyers, orderRequest);
+      const res = await placeOrder(fyers, orderRequest, splitOrders);
       logger.info(
         { orderRes: res, userId: user._id.toString(), name: user.name },
         "Order placed"
       );
-
-      // const coOrder: any = res[1]?.value || null;
-
-      // if (coOrder) {
-      //   safeMemCacheSet<string>(
-      //     `CO:${user._id.toString()}`,
-      //     coOrder.id,
-      //     7 * 60 * 60
-      //   );
-      // }
 
       if (user.isAdmin) {
         await sendMessageToChannel(`Trade Execution ${

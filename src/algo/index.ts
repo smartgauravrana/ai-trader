@@ -73,9 +73,5 @@ export default async function runAlgo() {
   logger.info({ isConnected }, "Socket connection status: ");
 
   // place order for each customer
-  if (isConnected) {
-    await placeOrdersV2(contract, aiResponse);
-  } else {
-    await placeOrders(contract, aiResponse);
-  }
+  await placeOrdersV2(contract, aiResponse, isConnected);
 }
