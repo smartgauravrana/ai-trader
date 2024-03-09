@@ -123,7 +123,7 @@ export async function placeOrders(contract: Contract, aiResponse: AIResponse) {
         stopLoss: 31,
         takeProfit: 58,
       };
-      const res = await placeOrder(fyers, orderRequest);
+      const res = await placeOrder(fyers, orderRequest, false);
       logger.info(
         { orderRes: res, userId: user._id.toString(), name: user.name },
         "Order placed"
