@@ -1,5 +1,12 @@
 import { LOT_SIZE } from "../constants";
 
+export type ModifyRequest = {
+  id: string;
+  type: number;
+  stopPrice: number;
+  limitPrice: number;
+};
+
 export type OrderRequest = {
   symbol: string;
   qty: number;
@@ -39,7 +46,8 @@ export type FyersFundDetails = {
 
 export function placeOrder(
   fyers: any,
-  createOrderReq: OrderRequest
+  createOrderReq: OrderRequest,
+  splitOrders: boolean
 ): Promise<any> {
   const { symbol, qty, limitPrice, stopLoss, takeProfit, stopPrice } =
     createOrderReq;
@@ -51,8 +59,7 @@ export function placeOrder(
 
   const bracketOrder = {
     symbol,
-    // qty: bracketOrderLots * LOT_SIZE,// TODO
-    qty: totalLots * LOT_SIZE,
+    qty: splitOrders ? bracketOrderLots * LOT_SIZE : qty,
     type: 4,
     side: 1, // buy
     productType: "BO",
@@ -66,39 +73,24 @@ export function placeOrder(
   };
   orders.push(bracketOrder);
 
-  // if (coverOrderLots > 0) {
-  //   // create CO order as well
-  //   const coverOrder = {
-  //     symbol,
-  //     qty: coverOrderLots * LOT_SIZE,
-  //     type: 4,
-  //     side: 1, // buy
-  //     productType: "CO",
-  //     limitPrice,
-  //     stopPrice,
-  //     disclosedQty: 0,
-  //     validity: "DAY",
-  //     offlineOrder: false,
-  //     stopLoss: 30,
-  //   };
-  //   orders.push(coverOrder);
-  // }
+  if (splitOrders && coverOrderLots > 0) {
+    // create CO order as well
+    const coverOrder = {
+      symbol,
+      qty: coverOrderLots * LOT_SIZE,
+      type: 4,
+      side: 1, // buy
+      productType: "CO",
+      limitPrice,
+      stopPrice,
+      disclosedQty: 0,
+      validity: "DAY",
+      offlineOrder: false,
+      stopLoss: 30,
+    };
+    orders.push(coverOrder);
+  }
 
-  // add logic if lot size more than 1
-  // const reqBody = {
-  //   symbol,
-  //   qty,
-  //   type: 4,
-  //   side: 1, // buy
-  //   productType: "BO",
-  //   limitPrice,
-  //   stopPrice,
-  //   disclosedQty: 0,
-  //   validity: "DAY",
-  //   offlineOrder: false,
-  //   stopLoss,
-  //   takeProfit,
-  // };
   return Promise.allSettled(
     orders.map((orderReq) => fyers.place_order(orderReq))
   );
@@ -114,6 +106,13 @@ export function getFundsDetails(fyers: any): Promise<FundLimitResponse> {
 
 export function getAllOrders(fyers: any): Promise<any> {
   return fyers.get_orders();
+}
+
+export function modifyOrder(
+  fyers: any,
+  modifyRequest: ModifyRequest
+): Promise<any> {
+  return fyers.modify_order(modifyRequest);
 }
 
 // fyers.get_profile().then((response) => {

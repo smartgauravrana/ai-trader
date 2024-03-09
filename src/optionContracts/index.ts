@@ -3,7 +3,7 @@ import { parse as csvParse } from "csv-parse";
 import client from "../utils/cache";
 import { logger } from "../logger";
 
-export type Contract = {
+export interface Contract {
   name: string;
   lot: number;
   tick: number;
@@ -14,7 +14,7 @@ export type Contract = {
   scripName: string;
   strikePrice: number;
   optionType: string;
-};
+}
 
 async function downloadAndParseCSV(
   url: string,

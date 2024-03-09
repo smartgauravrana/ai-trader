@@ -12,7 +12,14 @@ import {
 import { logger } from "../logger";
 import type { AIResponse } from "../ai";
 import { sendMessageToChannel } from "../telegram/bot";
-import { AVAILABLE_BALANCE_ID, LOT_SIZE } from "../constants";
+import {
+  AVAILABLE_BALANCE_ID,
+  DEFAULT_SL,
+  LOT_SIZE,
+  TAKE_PROFIT,
+} from "../constants";
+import memCache from "../utils/mem-cache";
+import { safeMemCacheSet } from "../utils";
 
 const { REDIRECT_URL } = process.env;
 const completedOrderStatus = [
@@ -23,14 +30,15 @@ const completedOrderStatus = [
 
 export async function placeOrdersV2(
   contract: Contract,
-  aiResponse: AIResponse
+  aiResponse: AIResponse,
+  splitOrders: boolean
 ) {
   logger.info("Place Order fn started");
   const users = await UserModel.find({
     "metadata.accessToken": { $exists: true },
   }).lean();
   const { results, errors } = await PromisePool.for(users)
-    .withConcurrency(20)
+    .withConcurrency(25)
     .process(async (user: User) => {
       const accessToken = user.metadata?.accessToken;
       if (!user.metadata || !accessToken) {
@@ -44,7 +52,7 @@ export async function placeOrdersV2(
         );
         return;
       }
-      const { fyersAppId, tradeQty } = user.metadata;
+      const { fyersAppId } = user.metadata;
       const FyersAPI = require("fyers-api-v3").fyersModel;
       const fyers = new FyersAPI();
       fyers.setAppId(fyersAppId);
@@ -93,10 +101,8 @@ export async function placeOrdersV2(
 
       const limitPrice = aiResponse.ltp + 1;
       const qty = getQuantitiesFromAvailableBalance(
-        // availableBalance,
-        // limitPrice,
-        36666,
-        400
+        availableBalance,
+        limitPrice
       );
 
       logger.info(
@@ -125,10 +131,10 @@ export async function placeOrdersV2(
         qty, // TODO change dynamically
         limitPrice,
         stopPrice: aiResponse.ltp,
-        stopLoss: 31,
-        takeProfit: 58,
+        stopLoss: DEFAULT_SL,
+        takeProfit: TAKE_PROFIT,
       };
-      const res = await placeOrder(fyers, orderRequest);
+      const res = await placeOrder(fyers, orderRequest, splitOrders);
       logger.info(
         { orderRes: res, userId: user._id.toString(), name: user.name },
         "Order placed"
