@@ -160,7 +160,7 @@ function getQuantitiesFromAvailableBalance(
   if (amount <= 0) {
     return 0;
   }
-  const bufferPrice = 70;
+  const bufferPrice = 50;
 
   const fundsToBeUsed = 0.6 * amount;
   const qty =
