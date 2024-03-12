@@ -9,7 +9,7 @@ const { EMAIL_DOMAIN } = process.env;
 
 export async function handleTokenRefresh() {
   try {
-    console.log("cron started");
+    logger.info("handleTokenRefresh cron started");
 
     const users = await UserModel.find({
       "metadata.accessToken": { $exists: true },
