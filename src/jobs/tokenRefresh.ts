@@ -81,6 +81,8 @@ export async function handleTokenRefresh() {
         }
       }
     );
+
+    logger.info({ results, errors }, "refresh token job completed");
   } catch (err: any) {
     logger.error({ err }, `Error inside handleTokenRefresh: ${err?.message}`);
   }
