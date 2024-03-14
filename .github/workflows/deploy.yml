@@ -29,6 +29,7 @@ jobs:
           echo REDIRECT_URL=${{ secrets.REDIRECT_URL}} >> .env
           echo TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN}} >> .env
           echo MYSTIC_CHANNEL_ID=${{ secrets.MYSTIC_CHANNEL_ID}} >> .env
+          echo ADMIN_CHANNEL_ID=${{ secrets.ADMIN_CHANNEL_ID}} >> .env
           echo TELEGRAM_API_ID=${{ secrets.TELEGRAM_API_ID}} >> .env
           echo TELEGRAM_API_HASH=${{ secrets.TELEGRAM_API_HASH}} >> .env
           echo REDIS_ENDPOINT=${{ secrets.REDIS_ENDPOINT}} >> .env
