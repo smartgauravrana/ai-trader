@@ -1,21 +1,23 @@
-import fetch from 'node-fetch';
-import { logger } from './logger';
+import fetch from "node-fetch";
+import { logger } from "./logger";
 
 export type AIResponse = {
   indexName: string;
   strike: number;
   ltp: number;
   type: string;
-}
+};
 
-const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + process.env.API_KEY;
+const url =
+  "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=" +
+  process.env.API_KEY;
 
 const headers = {
-  'Content-Type': 'application/json',
+  "Content-Type": "application/json",
 };
 
 const options = {
-  method: 'POST',
+  method: "POST",
   headers: headers,
   body: JSON.stringify({}),
 };
@@ -69,37 +71,40 @@ function getBody(message: string) {
             Output: NA
             
             Your input for message is: 
-            ${message}`
-          }
-        ]
-      }
-    ]
+            ${message}`,
+          },
+        ],
+      },
+    ],
   };
 }
 
 export const askAI = async (message: string): Promise<AIResponse | null> => {
   try {
-    logger.info('Asking GEMINI.......')
+    logger.info("Asking GEMINI.......");
     const bodyData = getBody(message);
-    options.body = JSON.stringify(bodyData)
+    options.body = JSON.stringify(bodyData);
     const response = await fetch(url, options);
     const responseData: any = await response.json();
     const text = responseData.candidates[0].content.parts[0].text.trim();
     logger.info("AI response: ", text);
 
-    const messages = text.split('\n');
+    const messages = text.split("\n");
     const [firstMessage] = messages;
     if (!firstMessage || firstMessage === "NA") {
       return null;
     }
-    const [indexName, strike, ltp, type] = messages[0].split(' ')
-    return {
-      indexName, strike: Number(strike), ltp: Number(ltp), type
 
-    }
+    const latestMessage = messages.pop();
+    const [indexName, strike, ltp, type] = latestMessage.split(" ");
+    return {
+      indexName,
+      strike: Number(strike),
+      ltp: Number(ltp),
+      type,
+    };
   } catch (error) {
-    console.error('Error:', error);
-    return null
+    console.error("Error:", error);
+    return null;
   }
 };
-

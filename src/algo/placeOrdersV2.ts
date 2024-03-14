@@ -63,20 +63,43 @@ export async function placeOrdersV2(
         { positionRes, userId: user._id.toString(), name: user.name },
         "positions"
       );
-      if (positionRes.overall.count_total > 0) {
+      if (positionRes.overall.count_open > 0) {
         logger.info(
           { userId: user._id.toString(), name: user.name },
-          "Today position already there, so skipping.. "
+          "Open position already there, so skipping.. "
+        );
+        return;
+      }
+
+      // check if contract is same
+      const currentSymbol = contract.symbol;
+
+      const isSymbolTradedAlready = positionRes.netPositions.find(
+        (position: any) => {
+          position.symbol == currentSymbol;
+        }
+      );
+
+      if (isSymbolTradedAlready) {
+        logger.info(
+          {
+            userId: user._id.toString(),
+            name: user.name,
+            symbol: currentSymbol,
+          },
+          "Symbol already traded today, so skipping.. "
         );
         return;
       }
 
       const ordersRes = await getAllOrders(fyers);
 
-      const isOrderForTodayAlreadyDone = ordersRes.orderBook.some(
-        (order: any) => completedOrderStatus.includes(order.status)
+      const isOrderForCurrentSymbolTodayAlreadyDone = ordersRes.orderBook.some(
+        (order: any) =>
+          completedOrderStatus.includes(order.status) &&
+          order.symbol == currentSymbol
       );
-      if (isOrderForTodayAlreadyDone) {
+      if (isOrderForCurrentSymbolTodayAlreadyDone) {
         logger.info(
           { userId: user._id.toString(), name: user.name },
           "No more trades to execute for today!"
