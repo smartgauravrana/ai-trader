@@ -25,9 +25,9 @@ function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export default async function runAlgo() {
+export default async function runAlgo(channelId: string) {
   // process message with AI LLM
-  const key = getKey(MYSTIC_CHANNEL_ID!);
+  const key = getKey(channelId!);
   let message = await cache.lrange(key, 0, -1);
   let messageStr = message.join("\n");
 
