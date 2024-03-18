@@ -98,9 +98,9 @@ export async function processLtpMsg(ltp: number) {
 
       // get the order to update with productType CO and type SL
       const ordersRes = await getAllOrders(fyers);
-      let COSellOrderId = null;
+      let COSellOrder = null;
       if (ordersRes.s === "ok") {
-        COSellOrderId = ordersRes.orderBook.find(
+        COSellOrder = ordersRes.orderBook.find(
           (order: any) =>
             order.productType === "CO" &&
             order.symbol === contract.symbol &&
@@ -110,13 +110,13 @@ export async function processLtpMsg(ltp: number) {
       }
       // update SL order with price plus 15
 
-      if (!COSellOrderId) {
+      if (!COSellOrder) {
         logger.info({ userId: id }, "No sell order of CO type");
         return;
       }
 
       await modifyOrder(fyers, {
-        id: COSellOrderId as string,
+        id: COSellOrder?.id as string,
         stopPrice: newSL as any,
         limitPrice: Number(newSL) - 4,
         type: ORDER_TYPES.SL_LIMIT,
