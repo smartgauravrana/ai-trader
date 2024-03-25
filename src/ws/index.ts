@@ -66,7 +66,7 @@ export async function getUpdatedSLPrice(
 }
 
 export async function processLtpMsg(ltp: number) {
-  logger.info("ltp: " + ltp);
+  // logger.info("ltp: " + ltp);
 
   const currentTrade = memCache.get<CurrentTrade>(KEYS.CURRENT_TRADE);
 
