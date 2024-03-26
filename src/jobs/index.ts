@@ -2,8 +2,8 @@ import cron from "node-cron";
 import { handleTokenRefresh } from "./tokenRefresh";
 import { aggregateFundsData } from "./dashboard";
 
-// 8am IST
-cron.schedule("30 3 * * *", handleTokenRefresh);
+// 9:10am IST
+cron.schedule("40 3 * * *", handleTokenRefresh);
 // 7pm IST
 // cron.schedule("30 13 * * *", handleTokenRefresh);
 
