@@ -26,12 +26,12 @@ export async function getUpdatedSLPrice(
   currentTrade?: CurrentTrade
 ): Promise<number | null> {
   if (!currentTrade?.contract) {
-    logger.info("SOCKET: no contract in memcache");
+    // logger.info("SOCKET: no contract in memcache");
     return null;
   }
 
   if (!currentTrade.aiResponse) {
-    logger.info("SOCKET: processMsg no ai response");
+    // logger.info("SOCKET: processMsg no ai response");
     return null;
   }
 
@@ -58,7 +58,7 @@ export async function getUpdatedSLPrice(
   }
 
   if (!newSL) {
-    logger.info("SOCKET: No SL to update");
+    // logger.info("SOCKET: No SL to update");
     return newSL;
   }
 
@@ -76,7 +76,7 @@ export async function processLtpMsg(ltp: number) {
 
   const newSL = getUpdatedSLPrice(ltp, currentTrade);
   if (!newSL) {
-    logger.info("No need of SL to update");
+    // logger.info("No need of SL to update");
     return;
   }
 
@@ -111,7 +111,7 @@ export async function processLtpMsg(ltp: number) {
       // update SL order with price plus 15
 
       if (!COSellOrder) {
-        logger.info({ userId: id }, "No sell order of CO type");
+        // logger.info({ userId: id }, "No sell order of CO type");
         return;
       }
 
