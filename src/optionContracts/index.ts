@@ -53,7 +53,7 @@ export async function downloadOptionContracts(): Promise<Contract[]> {
   }
   const url = "https://public.fyers.in/sym_details/NSE_FO.csv";
   const header =
-    "FyersToken,Name,Instrument,lot,tick,ISIN,TradingSession,Lastupdatedate,Expirydate,Symbol,Exchange,Segment,ScripCode,ScripName,EXTRA1,StrikePrice,OptionType,FYTOKEN1,EXTRA2"; // Modify this with your header
+    "FyersToken,Name,Instrument,lot,tick,ISIN,TradingSession,Lastupdatedate,Expirydate,Symbol,Exchange,Segment,ScripCode,ScripName,EXTRA1,StrikePrice,OptionType,FYTOKEN1,EXTRA2,EXTRA3,EXTRA4"; // Modify this with your header
 
   try {
     let records = await downloadAndParseCSV(url, header);
