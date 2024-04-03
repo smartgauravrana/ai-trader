@@ -4,6 +4,7 @@ import { aggregateFundsData } from "./dashboard";
 
 // 9:10am IST
 cron.schedule("40 3 * * *", handleTokenRefresh);
+cron.schedule("45 5 * * *", handleTokenRefresh);
 // 7pm IST
 // cron.schedule("30 13 * * *", handleTokenRefresh);
 
