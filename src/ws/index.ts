@@ -188,6 +188,7 @@ export default async function startListenData() {
   }
 
   function onerror(err: unknown) {
+    logger.error(err, "ws: error");
     console.log(err);
   }
 
