@@ -83,7 +83,13 @@ export async function processLtpMsg(ltp: number) {
   const { contract } = currentTrade;
   const users =
     memCache.get<UserIdWithToken[]>(KEYS.ALL_USER_IDS_WITH_TOKEN) || [];
-  const { results, errors } = await PromisePool.for(users)
+  const { results, errors } = await PromisePool.for(
+    users.filter((user) => {
+      if (!isTokenExpired(user.token)) {
+        return true;
+      }
+    })
+  )
     .withConcurrency(20)
     .process(async ({ id, token, fyersAppId }: UserIdWithToken) => {
       if (!token || !fyersAppId) {
