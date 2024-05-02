@@ -129,7 +129,7 @@ export async function processLtpMsg(ltp: number) {
       });
     });
 
-  logger.info({ results, errors }, "Updated SL for CO Orders");
+  // logger.info({ results, errors }, "Updated SL for CO Orders");
 }
 
 export default async function startListenData() {
